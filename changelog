@@ -1,2 +1,13 @@
+1.1.0.0
+Added thread lock to queue processing
+Added clean.sh
+Added start and help command
+Added variables to Gvar
+Added numbers to enums.py
+Created MessageQueue
+Created GPT module
+Created GetMediaType and Progress to utils.py
+Fixed Pool
+Minor changes in others files
 1.0.0.0
 First commit, initialized all modules and folders to start this project
