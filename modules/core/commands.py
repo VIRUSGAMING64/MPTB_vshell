@@ -19,11 +19,6 @@ def kill(message:Message):
     message.reply_text("Shutting down... Goodbye!")
     os._exit(0)
 
-
-def upload(message:Message):
-    args = message.text
-    file = getfullpath(args)
-
 def getid(message:Message):
     await_exec(message.reply_text,[f"Your ID: {message.from_user.id}"])
 
@@ -34,12 +29,55 @@ def help_bot(message:Message):
 def ls(message:Message):
     args = message.text.removeprefix("/ls")
     user = message.from_user
+    user:peer = database.get(user.id)
+    t_dirs = os.listdir(user.path)
+    files = []
+    dirs = []
+    for pth in t_dirs:
+        if os.path.isdir(pth):
+            dirs.append(pth)
+        else:
+            files.append(pth)
+    s:str = " " * 5 + f"[content in {user.path}]" + " " * 5
+    for pth in dirs:
+        s += F"{emojis.FILE_FOLDER} - {pth}"
+    for pth in files:
+        s += F"{emojis.LINKED_PAPERCLIPS} - {pth}"
+
+    await_exec(message.reply_text, [s]) 
 
 def rm(message:Message):
     args = message.text
+    args:str = args.removeprefix("/rm ")
+    user = database.get(message.from_user.id)
+    if args.isnumeric():
+        args = int2path(int(args),user)
+        if args == None:
+            await_exec(message.reply_text, ["index not found"])
+            return
+    
+    if not os.path.exists(args):
+        await_exec(message.reply_text, ["path not found"])
+    
+    p = 0
+    if os.path.isdir(args):
+        os.removedirs(args)
+        p = 1
+    else:
+        p = 2
+        os.remove(args)
+    a = ["path","folder","file"]
+    await_exec(message.reply_text, [f"{a[p]} removed"])
 
 def mkdir(message:Message):
     args = message.text
+    user = database.get(message.from_user.id)
+
+
+
+def upload(message:Message):
+    args = message.text
+    file = getfullpath(args)
 
 def ren(message:Message):
     args = message.text

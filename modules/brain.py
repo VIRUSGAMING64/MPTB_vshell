@@ -2,12 +2,13 @@ from modules.core.commands import *
 from modules.gvar import *
 from modules.chatgpt import *
 from telegram import *
-
+from modules.entity import *
 
 def only_message(message):
     if message == None:
         return
     flag = False
+    
     for com in COMMANDS:
         if message.text.startswith(com):
             commands[com](message)
@@ -36,6 +37,9 @@ def mainloop():
     while True:
         for que in [0,1,2,3]:
             mess:Message = actions.pop(que)
+            user = base.get(mess.id)
+            if user == None:
+                base.add(t_user2peer(mess.from_user))
             if que == 0:
                 runner.add(only_message,[mess])
             elif que == 1:

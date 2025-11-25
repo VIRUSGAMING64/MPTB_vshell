@@ -22,8 +22,8 @@ class database:
         new.bot_premium = data[BOT_PREMIUM]
         new.is_premium  = data[IS_PREMIUM]
         new.path        = data[PATH]
-        return new
-
+        return new #! ADD STATE FIELD TO DATABASE
+    
     def remove(self,user:peer):
         if self.dic.get(user.id) == None:
             return True
@@ -40,7 +40,7 @@ class database:
             of.write(data + "\n")
         of.close()
 
-    def get(self,id):
+    def get(self,id)->peer:
         return self.dic.get(id)
 
     def load(self,db_name):

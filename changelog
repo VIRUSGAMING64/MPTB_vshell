@@ -1,3 +1,10 @@
+2.2.0.0
+Now save a users in a file
+minor fix in str_user
+added int2path to utils
+added t_user2peer to utils
+added rm and ls commands (untesteds)
+added state to t_user (unused)
 2.1.0.0
 Added tests
 Added documentation (made by gemini 3)
