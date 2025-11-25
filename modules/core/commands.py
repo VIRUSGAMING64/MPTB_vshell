@@ -88,6 +88,17 @@ def size(message:Message):
 def comp(message:Message):
     args = message.text
 
+def su_state(message:Message):
+    user = database.get(message.from_user.id)
+    if not user.id in ADMINS_ID:
+        await_exec(message.reply_text,["access denied [not admin]"])
+    
+
+def banuser(message:Message):
+    user = database.get(message.from_user.id)
+    if not user.id in ADMINS_ID:
+        await_exec(message.reply_text,["access denied [not admin]"])
+
 
 commands            = {
     "/start": start,
@@ -100,7 +111,9 @@ commands            = {
     "/ren": ren,
     "/comp": comp,
     "/size": size,
-    "/getid": getid
+    "/getid": getid,
+    "/su_state": su_state,
+    "/banuser": banuser
 }
 
 COMMANDS = commands.keys()

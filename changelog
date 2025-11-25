@@ -1,3 +1,8 @@
+2.3.0.0
+Banned users can't use this bot
+Only admins use gpt-5-nano bot
+added banuser and set user state command (only definitions)
+added users state to enum
 2.2.0.0
 Now save a users in a file
 minor fix in str_user

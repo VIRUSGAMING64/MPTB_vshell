@@ -11,5 +11,6 @@ class peer:
         self.bot_premium = _json.get("bot_premium")
         self.path        = _json.get("path")
         self.state                   = 0
+        
     def __str__(self) -> str:
         return f"{self.name},{self.id},{self.bot_premium},{self.is_premium},{self.path}"

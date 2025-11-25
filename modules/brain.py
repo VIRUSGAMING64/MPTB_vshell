@@ -37,9 +37,12 @@ def mainloop():
     while True:
         for que in [0,1,2,3]:
             mess:Message = actions.pop(que)
-            user = base.get(mess.id)
+            user:peer = base.get(mess.id)
             if user == None:
+                user.path = f"env/{user.name}-{user.id}"
                 base.add(t_user2peer(mess.from_user))
+            if user.state & BANNED:
+                continue
             if que == 0:
                 runner.add(only_message,[mess])
             elif que == 1:
