@@ -16,7 +16,8 @@ def only_message(message):
         
         
 def only_up_media(message):
-    pass
+    if message == None:
+        return
 
 
 def only_dl_media(message):

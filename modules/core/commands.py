@@ -5,15 +5,6 @@ import asyncio
 import threading as th
 
 
-loop = asyncio.new_event_loop()
-def loop_runner():
-    global loop
-    asyncio.set_event_loop(loop)
-    loop.run_forever()
-
-th.Thread(target=loop_runner, daemon=True).start()
-
-
 def start(message:Message):
     global loop
     asyncio.run_coroutine_threadsafe(message.reply_text("Hello! I am your bot. How can I assist you today?"),loop)

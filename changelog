@@ -1,3 +1,7 @@
+2.0.0.0
+Gpt5-nano-module created
+Created await_exec for exectute await functions
+moved loop_runner() to  utils
 1.1.0.0
 Added thread lock to queue processing
 Added clean.sh
