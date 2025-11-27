@@ -13,4 +13,4 @@ class peer:
         self.state                   = 0
         
     def __str__(self) -> str:
-        return f"{self.name},{self.id},{self.bot_premium},{self.is_premium},{self.path}"
+        return f"{self.name},{self.id},{self.bot_premium},{self.is_premium},{self.path},{self.state}"

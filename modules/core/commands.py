@@ -29,7 +29,6 @@ def help_bot(message:Message):
     asyncio.run_coroutine_threadsafe(message.reply_text("Hello! I am your bot. [work in progress]"),loop)
 
 def ls(message:Message):
-    args = message.text.removeprefix("/ls")
     user = message.from_user
     user:peer = base.get(user.id)
     t_dirs = os.listdir(user.path)
@@ -45,7 +44,6 @@ def ls(message:Message):
         s += F"{emojis.FILE_FOLDER} - {pth}\n"
     for pth in files:
         s += F"{emojis.LINKED_PAPERCLIPS} - {pth}\n"
-
     await_exec(message.reply_text, [s]) 
 
 def rm(message:Message):
@@ -58,9 +56,11 @@ def rm(message:Message):
             await_exec(message.reply_text, ["index not found"])
             return
     
+    args = user.path + "/" + args
+
     if not os.path.exists(args):
         await_exec(message.reply_text, ["path not found"])
-    
+        return
     p = 0
     if os.path.isdir(args):
         os.removedirs(args)
@@ -70,6 +70,7 @@ def rm(message:Message):
         os.remove(args)
     a = ["path","folder","file"]
     await_exec(message.reply_text, [f"{a[p]} removed"])
+    ls(message)
 
 
 def mkdir(message:Message):

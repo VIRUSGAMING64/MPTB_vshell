@@ -1,3 +1,4 @@
+from operator import is_
 import pyrogram.emoji as emojis
 from telegram import *
 from modules.core.enums import *
@@ -50,8 +51,11 @@ def t_user2peer(us:User):
     pw.bot_premium = 0
     pw.id = us.id
     pw.is_premium = us.is_premium
+    if pw.is_premium == None:
+        pw.is_premium = 0
     pw.name = us.username
     pw.path = f"env/{pw.name}-{pw.id}"
+    pw.state = 0
     return pw
 
 
@@ -93,6 +97,7 @@ def newuser(id):
     user2.name = "..."
     user2.path = f"env/tmp-{id}"
     user2.is_premium = 0
+    user2.state = 0
     try:
         os.mkdir(user2.path)
     except:

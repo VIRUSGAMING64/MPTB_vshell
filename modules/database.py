@@ -20,8 +20,9 @@ class database:
         new.name        = data[USERNAME]
         new.id          = int(data[ID])
         new.bot_premium = data[BOT_PREMIUM]
-        new.is_premium  = data[IS_PREMIUM]
+        new.is_premium  = int(data[IS_PREMIUM])
         new.path        = data[PATH]
+        new.state       = int(data[STATE])
         return new #! ADD STATE FIELD TO DATABASE
     
     def remove(self,user:peer):

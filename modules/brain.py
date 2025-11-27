@@ -43,7 +43,9 @@ def mainloop():
             mess:Message = actions.pop(que)
             if mess == None:
                 continue
+
             user:peer = base.get(mess.from_user.id)
+            print(str(user))
             if user == None:
                 user = t_user2peer(mess.from_user)
                 base.add(user)
@@ -52,8 +54,14 @@ def mainloop():
                     os.mkdir(user.path)
                 except:
                     pass
-            if user.name == "?":
+            if user.name == "...":
                 user.name = mess.from_user.username
+                user.path = f"env/{user.name}-{user.id}"
+                try:
+                    os.mkdir(user.path)
+                except:
+                    pass
+
             if user.state & BANNED:
                 continue
             if que == 0:

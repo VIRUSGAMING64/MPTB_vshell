@@ -1,3 +1,10 @@
+2.4.2.0
+Added automatic admin registration on startup
+Updated database to persist user state
+Fixed ls and rm commands logic
+Added permission check for ChatGPT module
+Added ADMIN variable support in .env
+Improved user creation stability
 2.4.1.2
 Minor bug fixed
 2.4.1.1
