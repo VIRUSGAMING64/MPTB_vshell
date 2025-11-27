@@ -3,3 +3,4 @@ openai
 httpx
 requests
 pyrogram
+TgCrypto
