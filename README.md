@@ -1,4 +1,4 @@
-# 🚀 MPTB_vshell: Tu Asistente Virtual Avanzado en Telegram
+# 🚀 MPTB_vshell
 
 ![Python Version](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Telegram Bot API](https://img.shields.io/badge/Telegram-Bot%20API-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)
