@@ -5,7 +5,7 @@
 ![OpenAI](https://img.shields.io/badge/OpenAI-GPT-412991?style=for-the-badge&logo=openai&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 
-**MPTB_vshell** redefine la interacción con bots de Telegram. No es solo un bot, es un **sistema operativo virtual** en tu chat. Diseñado con una arquitectura modular y asíncrona, combina la potencia de una shell de comandos, gestión de archivos en la nube y la inteligencia artificial de OpenAI para ofrecer una experiencia de usuario sin precedentes.
+**MPTB_vshell** Diseñado con una arquitectura modular y asíncrona, combina la potencia de una shell de comandos, gestión de archivos en la nube y la inteligencia artificial de OpenAI para ofrecer una experiencia de usuario sin precedentes.
 
 ---
 
