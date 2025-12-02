@@ -136,5 +136,5 @@ Distribuido bajo la licencia **MIT**. Ver `LICENSE` para más información.
 
 ---
 <div align="center">
-  <sub>Desarrollado con ❤️ por <a href="https://github.com/VIRUSGAMING64">VIRUSGAMING64</a></sub>
+  <sub>Desarrollado por <a href="https://github.com/VIRUSGAMING64">VIRUSGAMING64</a></sub>
 </div>
