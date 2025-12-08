@@ -5,7 +5,7 @@ import threading as th
 import multiprocessing as mp
 import time
 
-TIMEOUT             = 0.01
+TIMEOUT             = 0.4
 
 class Pool():
     """
@@ -130,6 +130,6 @@ class MessageQueue():
         
 
 actions             =  MessageQueue()  #Queues with  messages
-runner              = Pool()
+runner              = Pool(128)
 
 runner.run()

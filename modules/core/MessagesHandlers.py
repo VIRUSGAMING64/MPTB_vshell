@@ -4,6 +4,7 @@ from modules.core.queues import *
 from modules.gvar import *
 
 async def on_message(update:Update,context):
+    print(f"message recived [...]")
     message = update.message
     if message.chat.type == Chat.PRIVATE:
         direct_message(update.message)

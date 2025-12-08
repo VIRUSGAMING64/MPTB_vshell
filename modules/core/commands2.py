@@ -1,3 +1,4 @@
+import requests
 from modules.core.queues import *
 from modules.gvar import *
 import os

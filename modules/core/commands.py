@@ -1,5 +1,13 @@
 from modules.core.commands2 import *
 
+
+def headers(message:Message):
+    url = message.text.removeprefix("/headers ")
+    response = requests.head(url)
+    await_exec(message.reply_text,[f"Headers for {url}:\n{response.headers}"])
+
+
+
 def start(message:Message):
     global loop
     asyncio.run_coroutine_threadsafe(message.reply_text("Hello! I am your bot. How can I assist you today?"),loop)
@@ -9,7 +17,7 @@ def kill(message:Message):
     if not message.from_user.id in ADMINS_ID:
         message.reply_text("operation not available")
         return
-    message.reply_text("Shutting down... Goodbye!")
+    await_exec(message.reply_text, ["Shutting down... Goodbye!"])
     os._exit(0)
 
 def getid(message:Message):
@@ -48,17 +56,17 @@ def rm(message:Message):
             return
     
     args = user.path + "/" + args
-
     if not os.path.exists(args):
         await_exec(message.reply_text, ["path not found"])
         return
     p = 0
     if os.path.isdir(args):
-        os.removedirs(args)
+        os.rmdir(args)
         p = 1
     else:
         p = 2
         os.remove(args)
+    
     a = ["path","folder","file"]
     await_exec(message.reply_text, [f"{a[p]} removed"])
     ls(message)
@@ -170,7 +178,8 @@ commands            = {
     "/su_state": su_state,
     "/banuser": banuser,
     "/queues": queues,
-    "/upload": upload
+    "/upload": upload,
+    "/headers": headers
 }
 
 COMMANDS = commands.keys()

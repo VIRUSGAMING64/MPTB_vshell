@@ -9,12 +9,17 @@ TOKEN               = os.getenv("TOKEN")
 API_HASH            = os.getenv("API_HASH")
 OPEN_AI_API_KEY     = os.getenv("OPEN_AI")
 API_ID              = os.getenv("API_ID")
-MANAGER_ID                     = os.getenv("ADMIN")
-FUSE_GROUP_ID       =  None #Ignored if fuse off
+MANAGER_ID          = os.getenv("ADMIN")
+FUSE_GROUP_ID       = None #Ignored if fuse off
 ADMINS_ID           = []
 DEBUG_ID            = []
-PROXY          = "http://127.0.0.1:8118" 
-DB_SAVE_TIMEOUT    = 60 #in seconds
+PROXY_HTTP          = os.getenv("HTTP_PROXY") 
+PROXY_HTTPS         = os.getenv("HTTPS_PROXY") 
+DB_SAVE_TIMEOUT     = 60 #in seconds
+PROXYES = {
+  "http": PROXY_HTTP,
+  "https": PROXY_HTTPS
+}
 
 if MANAGER_ID != None:
     if MANAGER_ID.isnumeric():
@@ -22,11 +27,11 @@ if MANAGER_ID != None:
 model = None
 
 if OPEN_AI_API_KEY != None:
-    model = openai.OpenAI(api_key=OPEN_AI_API_KEY,http_client=httpx.Client(proxy=PROXY))
+    model = openai.OpenAI(api_key=OPEN_AI_API_KEY,http_client=httpx.Client(proxy=PROXY_HTTP))
 
 bot = None
 sender = None
 base = database()
 if TOKEN != None:
-    bot = Application.builder().token(TOKEN).proxy(PROXY).build()
+    bot = Application.builder().token(TOKEN).proxy(PROXY_HTTP).build()
     sender = bot.bot

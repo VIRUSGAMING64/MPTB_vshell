@@ -5,6 +5,7 @@ from modules.core.enums import *
 import asyncio
 import threading as th
 from modules.entity import *
+import time
 
 loop = asyncio.new_event_loop()
 def loop_runner():
@@ -61,10 +62,13 @@ def t_user2peer(us:User):
 
 def await_exec(func,args):
     global loop
-    asyncio.run_coroutine_threadsafe(
+    fut = asyncio.run_coroutine_threadsafe(
         func(*args), loop
     )
-
+    while fut.running():
+        time.sleep(0.1)
+        print("awaiting...")
+    return fut._result
 
 def getfullpath(args:str):
     assert 0
