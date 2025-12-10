@@ -8,7 +8,7 @@ def gpt(message:Message):
 
         print(str(user))
         if not (user.state & LLM):
-            s = "contact to @VIRUSGAMING64 for access to gpt-5-nano"
+            s = "contact to any admin for access to gpt-5-nano"
             await_exec(message.reply_text,[s])
             return
         

@@ -25,9 +25,7 @@ def only_dl_media(message:Message):
     if message == None:
         return
     await_exec(message.reply_text,["sorry not implemented"])
-    return
-    res = await_exec(message.document.get_file)
-    print(res.file_path)
+    
 
 def only_url(message):
     if message == None:
