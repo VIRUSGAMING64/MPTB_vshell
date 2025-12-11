@@ -25,10 +25,10 @@ def progress(count, total, speed = None, message:Message = None, label = "Downlo
     else:
         por = ((count * 100) / total) / 10
     color = emojis.RED_CIRCLE
-    if por > 3:
+    if por > 4:
         color = emojis.ORANGE_CIRCLE
-    if por > 6:
-        color = emojis.RED_CIRCLE
+    if por > 7:
+        color = emojis.GREEN_CIRCLE
     progtext += f"{color}" * int(por) + f"{emojis.WHITE_CIRCLE}" * (10 - int(por))
     progtext += f"\n{por * 10}%\n"
     if speed != None:
@@ -146,6 +146,26 @@ def newuser(id):
     except:
         pass 
     return user2
+
+
+def _parse(user:peer, mess:Message)->peer:
+    if user == None:
+        user = t_user2peer(mess.from_user)
+        base.add(user)
+    
+    if user.name == "..." and mess.from_user.username:
+        user.name = mess.from_user.username
+    
+    user.path = f"env/{user.name}-{user.id}"
+    
+    if not os.path.exists(user.path):
+        try:
+            os.makedirs(user.path, exist_ok=True)
+        except Exception as e:
+            print(f"Error creating directory {user.path}: {e}")
+            
+    return user
+
 
 
 def pyrom(message: Message):

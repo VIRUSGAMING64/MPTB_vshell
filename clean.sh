@@ -10,3 +10,4 @@ rm -r */*/*/*/.cph
 rm -r saved
 rm -r logs.txt
 rm -r env
+rm -r downloader.session*

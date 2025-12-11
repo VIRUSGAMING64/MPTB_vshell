@@ -15,6 +15,12 @@ async def on_message(update:Update,context):
     else:
         unknow_message(message)
 
+async def on_inline_query(update:Update,context):
+    query = update.inline_query
+    query.answer([InlineQueryResult(
+        "Not implemented"
+    )])
+
 def direct_message(message:Message):
     print(message.from_user.name+" sent a message")
     actions.push(message)

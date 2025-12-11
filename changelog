@@ -1,3 +1,10 @@
+3.0.1.0
+Added clean.sh to gitignore
+Moved database_saver thread to bot.py
+Moved _parse function to utils
+Added TODO in gpt
+Added InlineQueryHandler  (not finalized)
+changes in downloader.py (not finalized)
 3.0.0.0
 Added web page with server in flask
 2.7.0.0

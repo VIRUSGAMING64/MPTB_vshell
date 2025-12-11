@@ -52,4 +52,3 @@ if TOKEN != None:
         api_hash=API_HASH,
         bot_token=TOKEN
     )
-    dlbot.start()

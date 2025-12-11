@@ -21,7 +21,8 @@ def gpt(message:Message):
         response = model.responses.create(
             model="gpt-5-nano",
             input=message.text,
-            max_output_tokens=10000,           
+            max_output_tokens=10000,
+            tools=[]    #todo add tool for web browsing 
         )    
         res = response.output_text.replace("\\n","\n")
         await_exec(message.reply_text,[res])

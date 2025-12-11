@@ -18,9 +18,31 @@ def __init__(bot:Application):
 def __init_web__():
     import web.app
 
+def database_saver():
+    while True:
+        time.sleep(DB_SAVE_TIMEOUT)
+        base.save()
 
-    
-th.Thread(target=__init_web__).start()
-th.Thread(target=__init__,args=[bot]).start()
+def __pyrodl__():
+    while True:
+        try:
+            dlbot.start()
+            break
+        except Exception as e:
+            print(e)
+            
+th.Thread(target=__pyrodl__,daemon = True).start()
+th.Thread(target=database_saver,daemon = True).start()
+th.Thread(target=__init_web__,daemon = True).start()
+th.Thread(target=__init__,args=[bot],daemon = True).start()
+
 bot.add_handler(MessageHandler(filters.ALL,on_message))
-bot.run_polling(allowed_updates=Update.ALL_TYPES)
+bot.add_handler(InlineQueryHandler(on_inline_query))
+
+while True:
+    try:
+        bot.run_polling(allowed_updates=Update.ALL_TYPES)
+        break
+    except Exception as e:
+        print(e)
+        time.sleep(10)
