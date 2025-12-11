@@ -1,140 +1,88 @@
-# 🚀 MPTB_vshell
+# 🤖 MPTB_vshell
 
-![Python Version](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Telegram Bot API](https://img.shields.io/badge/Telegram-Bot%20API-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)
-![OpenAI](https://img.shields.io/badge/OpenAI-GPT-412991?style=for-the-badge&logo=openai&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+**MPTB_vshell** es un framework de bot de Telegram modular y robusto, diseñado para integrar la potencia de **OpenAI (ChatGPT)** con capacidades avanzadas de gestión de medios. Su arquitectura flexible permite una fácil extensión y personalización.
 
-**MPTB_vshell** Diseñado con una arquitectura modular y asíncrona, combina la potencia de una shell de comandos, gestión de archivos en la nube y la inteligencia artificial de OpenAI para ofrecer una experiencia de usuario sin precedentes.
+## 🚀 Características Principales
 
----
+- **🤖 Integración Profunda con Telegram**: Construido sobre `python-telegram-bot` para una interacción fluida y reactiva.
+- **🧠 Inteligencia Artificial**: Soporte nativo para **OpenAI (ChatGPT)**, permitiendo conversaciones naturales y procesamiento de lenguaje.
+- **📂 Gestión de Medios Avanzada**: Descarga y subida de archivos grandes y gestión de medios utilizando la eficiencia de `Pyrogram`.
+- **👤 Sistema de Usuarios y Roles**: Gestión completa de usuarios, estados y permisos (Admin, Usuario, Banned, etc.).
+- **🧩 Arquitectura Modular**: Código organizado en módulos independientes (`brain`, `core`, `downup`, etc.) para facilitar el mantenimiento y la escalabilidad.
+- **💾 Persistencia de Datos**: Sistema de base de datos simple pero efectivo para mantener el estado.
 
-## ✨ Características Destacadas
+## 📋 Requisitos
 
-### 🧠 Inteligencia Artificial Integrada
-Conversa de manera natural, obtén ayuda con código o genera contenido creativo gracias a la integración nativa con **OpenAI (ChatGPT)**. El bot mantiene el contexto y ofrece respuestas precisas.
+- 🐍 **Python 3.8** o superior.
+- 📱 Una cuenta de **Telegram** y un **Bot Token** (obtenido de @BotFather).
+- 🔑 **API ID** y **API Hash** de Telegram (para Pyrogram, obtenible en my.telegram.org).
+- 🤖 **OpenAI API Key** (opcional, para funcionalidades de IA).
 
-### 📂 Sistema de Archivos Virtual (VFS)
-Gestiona tus archivos como si estuvieras en una terminal Linux.
-*   **Navegación:** Crea carpetas (`mkdir`), lista contenidos (`ls`) y organiza tu espacio.
-*   **Gestión:** Elimina (`rm`), renombra y verifica tamaños (`size`) de archivos fácilmente.
-*   **Nube Personal:** Sube y descarga archivos a tu "nube" privada gestionada por el bot.
+## 🛠️ Instalación
 
-### ⚡ Rendimiento y Concurrencia
-Olvídate de los bots lentos. **MPTB_vshell** utiliza:
-*   **Colas de Mensajes (`MessageQueue`):** Para un procesamiento ordenado y eficiente.
-*   **Multithreading & Asyncio:** Maneja múltiples descargas, subidas y consultas a la IA simultáneamente sin bloquearse.
+1. **Clona el repositorio:**
+   ```bash
+   git clone <url-del-repositorio>
+   cd MPTB_vshell
+   ```
 
-### 🛡️ Administración Robusta
-*   Sistema completo de gestión de usuarios y permisos.
-*   Base de datos personalizada para persistencia de estados.
-*   Herramientas de moderación y control administrativo (`ban`, `promote`).
+2. **Crea un entorno virtual (recomendado):**
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # En Linux/Mac
+   # .venv\Scripts\activate  # En Windows
+   ```
 
----
+3. **Instala las dependencias:**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## 🛠️ Instalación y Configuración
+## ⚙️ Configuración
 
-### 1. Requisitos Previos
-*   Python 3.8 o superior.
-*   Cuenta de Telegram y Token del bot (@BotFather).
-*   (Opcional) API Key de OpenAI.
-*   (Opcional) API ID y Hash de Telegram (para funcionalidades de cliente de usuario/Pyrogram).
+El bot utiliza variables de entorno para su configuración. Puedes establecerlas en tu sistema o crear un archivo `.env` (si usas una librería para cargarlo) o exportarlas antes de ejecutar.
 
-### 2. Clonar el Repositorio
-```bash
-git clone https://github.com/VIRUSGAMING64/MPTB_vshell.git
-cd MPTB_vshell
-```
+Las variables requeridas son:
 
-### 3. Configurar Entorno Virtual
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# .\venv\Scripts\activate # Windows
-```
+| Variable | Descripción |
+|----------|-------------|
+| `TOKEN` | Token del bot de Telegram. |
+| `API_ID` | ID de aplicación de Telegram. |
+| `API_HASH` | Hash de la API de Telegram. |
+| `OPEN_AI` | Clave de API de OpenAI. |
+| `ADMIN` | ID numérico del administrador principal. |
+| `HTTP_PROXY` | (Opcional) Proxy HTTP. |
+| `HTTPS_PROXY` | (Opcional) Proxy HTTPS. |
 
-### 4. Instalar Dependencias
-```bash
-pip install -r requirements.txt
-```
+## ▶️ Uso
 
-### 5. Configuración de Variables
-Crea un archivo `.env` en la raíz o exporta las siguientes variables de entorno:
+Una vez configurado, inicia el bot con el siguiente comando:
 
-| Variable | Descripción | Requerido |
-| :--- | :--- | :--- |
-| `TOKEN` | El token de tu bot obtenido de @BotFather. | ✅ Sí |
-| `ADMIN` | Tu ID de usuario de Telegram (para permisos de root). | ✅ Sí |
-| `OPEN_AI` | Tu API Key de OpenAI (para funciones de IA). | ❌ No |
-| `API_ID` | Tu App ID de my.telegram.org. | ❌ No |
-| `API_HASH` | Tu App Hash de my.telegram.org. | ❌ No |
-
----
-
-## 🎮 Guía de Uso
-
-Inicia el bot con:
 ```bash
 python bot.py
 ```
 
-### Comandos Principales
-
-#### 🐚 Shell y Archivos
-*   `/ls` - Lista los archivos y directorios en tu ruta actual.
-*   `/mkdir <nombre>` - Crea una nueva carpeta.
-*   `/rm <nombre|índice>` - Elimina un archivo o carpeta.
-*   `/size <nombre|índice>` - Muestra el tamaño de un archivo o directorio.
-
-#### 🤖 Utilidades
-*   `/start` - Inicia el bot y verifica el estado.
-*   `/getid` - Muestra tu ID de Telegram (útil para configurar `ADMIN`).
-*   `/help` - Muestra el mensaje de ayuda.
-
-#### 👑 Administración (Solo Admin)
-*   `/kill` - Apaga el bot remotamente.
-*   `/su_state` - Cambia permisos de usuarios.
-*   `/banuser` - Restringe acceso a usuarios.
-
----
-
-## 📂 Estructura del Código
-
-El proyecto sigue una estructura limpia y modular para facilitar la contribución:
+## 📂 Estructura del Proyecto
 
 ```text
 MPTB_vshell/
-├── bot.py              # 🚀 Entry point: Inicialización y polling
-├── modules/            # 📦 Núcleo del sistema
-│   ├── core/           # Comandos base, colas y handlers
-│   ├── downup/         # Motores de descarga y subida
-│   ├── entity/         # Modelos de datos (User, File)
-│   ├── brain.py        # Lógica de procesamiento central
-│   ├── chatgpt.py      # Cliente de OpenAI
-│   └── database.py     # Motor de base de datos JSON/Pickle
-├── web/                # 🌐 Interfaz Web (Dashboard/Status)
-├── tests/              # 🧪 Tests unitarios
-└── requirements.txt    # Dependencias del proyecto
+├── bot.py                  # 🚀 Punto de entrada principal del bot
+├── clean.sh                # 🧹 Script de limpieza de archivos temporales
+├── database.csv            # 💾 Base de datos simple (CSV)
+├── requirements.txt        # 📦 Lista de dependencias
+├── runtests.py             # 🧪 Script para ejecutar pruebas
+├── modules/                # 🧩 Lógica modular del bot
+│   ├── brain.py            # 🧠 Cerebro: Procesamiento de mensajes
+│   ├── chatgpt.py          # 🤖 IA: Integración con OpenAI
+│   ├── database.py         # 🗄️ DB: Manejo de base de datos
+│   ├── gvar.py             # ⚙️ Config: Variables globales y entorno
+│   ├── utils.py            # 🛠️ Utils: Herramientas varias
+│   ├── core/               # ⚡ Core: Comandos, colas y workers
+│   ├── downup/             # 📥📤 DownUp: Descarga y subida de medios
+│   ├── entity/             # 👤 Entity: Definición de objetos (User, etc.)
+│   └── fuse/               # 🔌 Fuse: Módulos adicionales/experimentales
+├── web/                    # 🌐 Web: Interfaz web de administración
+│   ├── web.py
+│   └── src/
+└── tests/                  # 🧪 Tests: Pruebas unitarias
 ```
-
----
-
-## 🤝 Contribución
-
-¡Tu ayuda es bienvenida! Si tienes ideas para mejorar **MPTB_vshell**:
-1.  Haz un Fork del proyecto.
-2.  Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`).
-3.  Haz Commit de tus cambios (`git commit -m 'Add some AmazingFeature'`).
-4.  Haz Push a la rama (`git push origin feature/AmazingFeature`).
-5.  Abre un Pull Request.
-
----
-
-## 📄 Licencia
-
-Distribuido bajo la licencia **MIT**. Ver `LICENSE` para más información.
-
----
-<div align="center">
-  <sub>Desarrollado por <a href="https://github.com/VIRUSGAMING64">VIRUSGAMING64</a></sub>
-</div>

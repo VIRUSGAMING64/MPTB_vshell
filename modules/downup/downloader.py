@@ -1,20 +1,17 @@
-from more_itertools import chunked
 from modules.entity import *
 from modules.gvar import *
 from modules.core import *
 from modules.database import *
 import requests as rq
-from multiprocessing import Process
 from telegram.ext import *
 from pyrogram import Client
-
-from tkinter.tix import Tree
 
 class downloader:
     def __init__(self,sender:Bot|Client, user:peer, threads = 32):
         self.sender = sender
         self.user = user
         self.threads = threads
+        self.name = "file" #! Error change this name
 
     def update_message(self):
         pass
@@ -50,11 +47,16 @@ class downloader:
         return int(len)
     
     def multithread(self,url):
-        pass
+        return False
 
     def download(self, url:str): 
         len = self.getlenght(url)    
-        
-        if self.multithread(url):
-            return True
-        
+        try:    
+            if self.multithread(url):
+                return True
+            else:
+                self._download(url, 0, len - 1, self.name)
+                return True
+        except Exception as e:
+            print("download error " + str(e))
+            return False

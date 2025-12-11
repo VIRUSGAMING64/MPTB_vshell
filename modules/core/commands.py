@@ -30,11 +30,17 @@ def help_bot(message:Message):
 def ls(message:Message):
     user = message.from_user
     user:peer = base.get(user.id)
-    t_dirs = os.listdir(user.path)
+    try:
+        t_dirs = os.listdir(user.path)
+    except FileNotFoundError:
+        await_exec(message.reply_text, ["Directory not found"])
+        return
+
     files = []
     dirs = []
     for pth in t_dirs:
-        if os.path.isdir(user.path+"/"+pth):
+        full_path = os.path.join(user.path, pth)
+        if os.path.isdir(full_path):
             dirs.append(pth)
         else:
             files.append(pth)
@@ -55,7 +61,7 @@ def rm(message:Message):
             await_exec(message.reply_text, ["index not found"])
             return
     
-    args = user.path + "/" + args
+    args = os.path.join(user.path, args)
     if not os.path.exists(args):
         await_exec(message.reply_text, ["path not found"])
         return
@@ -82,7 +88,7 @@ def mkdir(message:Message):
         await_exec(message.reply_text, ["send a valid directory name"])
         return 
     dirname = dirname[0]
-    newdir = user.path + "/" + dirname
+    newdir = os.path.join(user.path, dirname)
     try:
         os.mkdir(newdir)
     except Exception as e:

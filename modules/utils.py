@@ -1,4 +1,4 @@
-from operator import is_
+import datetime
 import pyrogram.emoji as emojis
 from telegram import *
 from modules.core.enums import *
@@ -17,19 +17,29 @@ def loop_runner():
 th.Thread(target=loop_runner, daemon=True).start()
 
 
-def progress(count, total,base = "", speed = None, label = "Downloading"):
-    base += f"{label}\n"
-    por = ((count * 100) // total) // 10
+def progress(count, total, speed = None, message:Message = None, label = "Downloading"):
+    progtext = f"{label}\n"
+    if total == 0:
+        por = 0
+        print("total is 0!!!   :()")
+    else:
+        por = ((count * 100) / total) / 10
     color = emojis.RED_CIRCLE
     if por > 3:
         color = emojis.ORANGE_CIRCLE
     if por > 6:
         color = emojis.RED_CIRCLE
-    base += f"{color}" * por + f"{emojis.WHITE_CIRCLE}" * (10 - por)
-    base += f" {count * 100 // total}%\n"
+    progtext += f"{color}" * int(por) + f"{emojis.WHITE_CIRCLE}" * (10 - int(por))
+    progtext += f"\n{por * 10}%\n"
     if speed != None:
-        base += f"Speed: {speed}/s"
-    return base
+        progtext += f"Speed: {speed}/s"
+
+    if datetime.datetime.now().second % 2 == 0:
+        await_exec(message.edit_text,[progtext])
+
+
+    print(progtext)
+    return progtext
     
 
 def GetMedia(message:Message):
@@ -47,6 +57,21 @@ def GetMedia(message:Message):
     return media_type
 
 
+def get_file_id(message: Message):
+    typ = GetMedia(message)
+    if typ & DOCUMENT:
+        return message.document.file_id
+    elif typ & AUDIO:
+        return message.audio.file_id
+    elif typ & VIDEO:
+        return message.video.file_id
+    elif typ & PHOTO:
+        return message.photo[-1].file_id
+    elif typ & VOICE:
+        return message.voice.file_id
+    return None
+
+
 def t_user2peer(us:User):
     pw = peer()
     pw.bot_premium = 0
@@ -60,39 +85,53 @@ def t_user2peer(us:User):
     return pw
 
 
-def await_exec(func,args):
+def await_exec(func,args, target_loop=None):
     global loop
+    if target_loop is None:
+        try:
+            from modules import gvar
+            if gvar.bot and hasattr(gvar.bot, 'bot_loop') and gvar.bot.bot_loop and gvar.bot.bot_loop.is_running():
+                target_loop = gvar.bot.bot_loop
+        except:
+            pass
+
+    use_loop = target_loop if target_loop else loop
     fut = asyncio.run_coroutine_threadsafe(
-        func(*args), loop
+        func(*args), use_loop
     )
     while fut.running():
         time.sleep(0.1)
         print("awaiting...")
-    return fut._result
+
+    return fut.result()
 
 def getfullpath(args:str):
     assert 0
 
 
-def int2path(idx,user):
-    t_dirs = os.listdir(user.path)
-    files = []
-    t_dirs = []
-    for pth in t_dirs:
-        if os.path.isdir(pth):
-            t_dirs.append(pth)
-        else:
-            files.append(pth)
-    dirs = []
-    for i in t_dirs:
-        dirs.append(i)
-    for i in files:
-        dirs.append(files)
-    
-    if idx < 0 or idx >= len(dirs):
+def int2path(idx, user):
+    try:
+        dirs = os.listdir(user.path)
+    except OSError:
         return None
+
+    dirs = []
+    files = []
     
-    return dirs[idx]
+    for di in dirs:
+        full_path = os.path.join(user.path, di)
+        if os.path.isdir(full_path):
+            dirs.append(di)
+        else:
+            files.append(di)
+            
+    # Combine dirs and files to match 'ls' order
+    items = dirs + files
+    
+    if 0 <= idx < len(items):
+        return items[idx]
+    
+    return None
 
 def newuser(id):
     user2 = peer()
@@ -107,3 +146,117 @@ def newuser(id):
     except:
         pass 
     return user2
+
+
+def pyrom(message: Message):
+    import pyrogram
+    if message is None:
+        return None
+    
+    chat = None
+    if message.chat:
+        chat_type = str(message.chat.type).upper()
+        p_chat_type = None
+        if hasattr(pyrogram.enums.ChatType, chat_type):
+            p_chat_type = getattr(pyrogram.enums.ChatType, chat_type)
+            
+        chat = pyrogram.types.Chat(
+            id=message.chat.id,
+            type=p_chat_type,
+            title=message.chat.title,
+            username=message.chat.username
+        )
+
+    from_user = None
+    if message.from_user:
+        from_user = pyrogram.types.User(
+            id=message.from_user.id,
+            is_bot=message.from_user.is_bot,
+            first_name=message.from_user.first_name,
+            last_name=message.from_user.last_name,
+            username=message.from_user.username,
+            language_code=message.from_user.language_code
+        )
+
+    # Media handling
+    photo = None
+    if message.photo:
+        # PTB returns a list of PhotoSize, we take the last one (biggest)
+        p = message.photo[-1]
+        photo = pyrogram.types.Photo(
+            file_id=p.file_id,
+            file_unique_id=p.file_unique_id,
+            width=p.width,
+            height=p.height,
+            file_size=p.file_size,
+            date=message.date
+        )
+
+    video = None
+    if message.video:
+        v = message.video
+        video = pyrogram.types.Video(
+            file_id=v.file_id,
+            file_unique_id=v.file_unique_id,
+            width=v.width,
+            height=v.height,
+            duration=v.duration,
+            mime_type=v.mime_type,
+            file_size=v.file_size,
+            file_name=v.file_name,
+            date=message.date
+        )
+
+    document = None
+    if message.document:
+        d = message.document
+        document = pyrogram.types.Document(
+            file_id=d.file_id,
+            file_unique_id=d.file_unique_id,
+            file_name=d.file_name,
+            mime_type=d.mime_type,
+            file_size=d.file_size,
+            date=message.date
+        )
+        
+    audio = None
+    if message.audio:
+        a = message.audio
+        audio = pyrogram.types.Audio(
+            file_id=a.file_id,
+            file_unique_id=a.file_unique_id,
+            duration=a.duration,
+            performer=a.performer,
+            title=a.title,
+            mime_type=a.mime_type,
+            file_size=a.file_size,
+            date=message.date
+        )
+
+    voice = None
+    if message.voice:
+        v = message.voice
+        voice = pyrogram.types.Voice(
+            file_id=v.file_id,
+            file_unique_id=v.file_unique_id,
+            duration=v.duration,
+            mime_type=v.mime_type,
+            file_size=v.file_size,
+            date=message.date
+        )
+
+    return pyrogram.types.Message(
+        id=message.message_id,
+        date=message.date,
+        chat=chat,
+        from_user=from_user,
+        text=message.text,
+        caption=message.caption,
+        photo=photo,
+        video=video,
+        document=document,
+        audio=audio,
+        voice=voice,
+        media_group_id=message.media_group_id
+    )
+

@@ -4,8 +4,9 @@ def __init__(bot:Application):
     while not bot.running:
         time.sleep(TIMEOUT)
     print(bot.running)
+    loop = bot.bot_data.get('bot_loop')
     for admin in ADMINS_ID:
-        print(await_exec(bot.bot.send_message,[admin,"bot started..."]))
+        print(await_exec(bot.bot.send_message,[admin,"bot started..."], target_loop=loop))
         admin_user = base.get(admin)
         if admin_user == None:
             admin_user = newuser(admin)

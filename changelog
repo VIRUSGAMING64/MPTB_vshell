@@ -1,3 +1,15 @@
+2.7.0.0
+Added .session files to gitignore
+Updated README with new instructions
+Added await_exec target_loop parameter to support cross-loop execution
+Fixed bot startup message to admins using the correct event loop
+Fixed progress function
+2.6.1.0
+Added _parse function un brain.py
+Added headers function for http requests
+Implemented minor part of downloader
+Added proxy support to downloader
+Added return await_exec
 2.5.1.0
 Important bugs fixed
 2.5.0.0
