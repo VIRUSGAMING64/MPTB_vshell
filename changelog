@@ -1,3 +1,7 @@
+3.1.1.0
+Fix bug in downloader.py, now downloads files correctly
+Added url downloader to brain module
+Added save_folder parameter to downloader.download() method
 3.1.0.0
 Added support for inline queries (not finalized)
 Added support for bot handler at begin of commands

@@ -1,4 +1,5 @@
 from modules.core.commands import *
+from modules.downup import downloader
 from modules.gvar import *
 from modules.chatgpt import *
 from telegram import *
@@ -26,13 +27,12 @@ def only_up_media(message:Message):
     await_exec(message.reply_text,["sorry not implemented"])
 
 
-
 def only_dl_media(message:Message):
     if message == None:
         return
     id = get_file_id(message)
     if id == None:
-        await_exec(message.reply_text,["sorry not implemented contact with admin"])
+        await_exec(message.reply_text,["sorry contact with admin"])
     else:
         print("Downloading media...")
         mess:Message=await_exec(message.reply_text,["Downloading media..."])
@@ -45,10 +45,13 @@ def only_dl_media(message:Message):
 
 def only_url(message):
     if message == None: return
-    await_exec(message.reply_text,["sorry not implemented"])
-
-
-
+    if message.text == None: return
+    url = message.text
+    mes = await_exec(message.reply_text,[f"Starting download from url: {url}"])
+    user = base.get(message.from_user.id)
+    down = downloader()
+    name = down.getname(url)
+    down.download(url, user.path)
 
 def mainloop():
     print("mainloop started")

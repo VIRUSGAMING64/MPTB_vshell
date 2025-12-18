@@ -1,4 +1,3 @@
-from numpy import single
 from modules.entity import *
 from modules.gvar import *
 from modules.core import *
@@ -20,9 +19,12 @@ class downloader:
 
     def getdata(self,url,l,r) -> bytes:
         data = b""
-        with rq.get(url,stream=True, allow_redirects=True) as webfile:
-            for chunk in webfile.iter_content(1024, False):
+        headers = {"Range":f"bytes={l}-{r}"}
+        resp = rq.get(url,headers=headers,stream=True)
+        for chunk in resp.iter_content(chunk_size=8192):
+            if chunk:
                 data += chunk
+
         return data
     
     def add(self,data,file,mode = "ab"):
@@ -30,41 +32,36 @@ class downloader:
         file.write(data)
         file.close()
 
-
-    def _download(self,url, l, r, id, single = False):
-        BS = 16 * 1024
+    def _download(self,url, l, r, filename, single = False):
+        BS = 1024*1024
         data = ""
-        file = id
         while l <= r:
-            if l + BS < r and l % BS == 0:
-                data = self.getdata(url, l , l + BS)
-                l += BS
-            else:
-                data = self.getdata(url, l , l)
-                l += 1
-            file.write(data)
-            self.add(data,file)
+            print(l)
+            data = self.getdata(url, l , l + BS)
+            l += BS
+            self.add(data,filename)
             if single == True:
                 self.call(l,r,*self.args)
 
 
-    def getlenght(self,url):
+    def getlenght(self,url) -> int:
         heads = rq.head(url).headers
         len = heads["Content-Length"]
         return int(len)
 
 
-    def getname(self):
-        raise "TODO"
+    def getname(self,url) -> str:
+        if not "/" in url:
+            return "unnamed.file" 
+        url = url.rsplit("/",1)[1]
+        return url
 
-
-    def multithread(self,url):
+    def multithread(self,url) -> bool:
         return False
 
-
-    def download(self, url:str): 
+    def download(self, url:str, save_folder:str = "") -> bool: 
         len = self.getlenght(url)    
-        name = self.getname(url)
+        name = save_folder + "/" +self.getname(url)
         try:    
             if self.multithread(url):
                 return True
