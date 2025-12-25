@@ -1,11 +1,17 @@
+from ast import parse
 import os
+from pickle import FALSE
 import shutil
 from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash
+from modules.compress.video import *
 
 app = Flask(import_name=__name__)
 app.secret_key = 'supersecretkey' # Necesario para flash messages
 UPLOAD_FOLDER = 'env'
 app.config['UPLOAD_FOLDER'] = os.path.realpath(UPLOAD_FOLDER)
+TOTAL = 0
+PART  = 0
+OK    = True
 
 # Asegurarse de que la carpeta de subidas existe
 BASE_DIR =  app.config['UPLOAD_FOLDER']
@@ -44,7 +50,6 @@ def index():
     except PermissionError:
         flash('Permiso denegado', 'error')
 
-    # Ordenar alfabéticamente
     folders.sort()
     files.sort()
 
@@ -84,6 +89,7 @@ def delete_item():
             flash(f'Error al eliminar: {str(e)}', 'error')
     return redirect(url_for('index', path=current_path))
 
+
 @app.route('/upload', methods=['POST'])
 def upload_file():
     current_path = request.form.get('current_path', '')
@@ -111,6 +117,43 @@ def download_file():
         
     abs_path, _ = get_safe_path(req_path)
     return send_from_directory(abs_path, filename, as_attachment=True)
+
+def update_stat(total,part,ok):
+    global TOTAL,PART,OK
+    TOTAL = total
+    PART = part
+    OK = ok
+
+@app.route("/combstats",methods = ["GET"])
+def combstats():
+    global TOTAL,PART,OK
+    if TOTAL == 0:
+        TOTAL = 1
+    return {
+        "combertion":{
+            "total":TOTAL,
+            "part": PART,
+            "percent": PART/TOTAL * 100,
+            "ok": OK
+        }
+    }
+
+@app.route("/combert",methods = ['POST'])
+def combert():
+    
+    current_path = request.form.get('current_path', '')
+    item_name    = request.form.get('item_name')
+    item_type    = request.form.get('item_type') # 'file' or 'folder'
+
+    if OK == False:
+        return redirect(url_for('index', path=current_path))
+    
+    infile, _    = get_safe_path(os.path.join(current_path, item_name))
+    comp         = VideoCompressor(infile, update_stat,parse_end=True)
+    
+    Thread(target=comp.compress,daemon=True).start()
+    return redirect(url_for('index', path=current_path))
+
 
 try:
     app.run(host='0.0.0.0', port=80)

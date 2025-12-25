@@ -3,15 +3,18 @@ import time
 import subprocess as subp
 from threading import Thread
 
+
 class VideoCompressor():
-    def __init__(self,filename = None,callback = None,args = []):
+    def __init__(self,filename = None,callback = None,args = [],parse_end=False):
         self.base_cmd = "ffmpeg -i $in$ -c:v libx265 -preset medium $out$"
-        self.out = '$out$'
+        self.out = '$out$'  
         self.inp = '$in$'
         self.stop = False
         self.callback = callback
         self.name = None
         self.args = args    
+        self.ended = True
+        self.parse_ended = parse_end
         self.set_file(filename)
 
 
@@ -19,11 +22,13 @@ class VideoCompressor():
         if self.name == None:
             return False
         
+        self.ended = False
         th = Thread(target = self.stat_update)
         th.start()
         pr = subp.getoutput(self.base_cmd)
         self.stop = True
-        print(pr)
+        self.ended = True
+        return True
 
 
     def set_file(self,filename):
@@ -48,5 +53,13 @@ class VideoCompressor():
             part  = os.path.getsize(self.out)
             percent = part / total * 100
             if self.callback != None:
+                if self.parse_ended :
+                    self.callback(total,part,self.ended,*self.args)
+                else:
+                    self.callback(total,part,*self.args)
+                    
+        if self.callback != None:
+            if self.parse_ended :
+                self.callback(total,part,self.ended,*self.args)
+            else:
                 self.callback(total,part,*self.args)
-            

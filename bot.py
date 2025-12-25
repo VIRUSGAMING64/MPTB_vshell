@@ -33,8 +33,8 @@ def __pyrodl__():
         except Exception as e:
             print(e)
             
-th.Thread(target=__pyrodl__,daemon = True).start()
 th.Thread(target=database_saver,daemon = True).start()
+th.Thread(target=__pyrodl__,daemon = True).start()
 th.Thread(target=__init_web__,daemon = True).start()
 th.Thread(target=__init__,args=[bot],daemon = True).start()
 

@@ -1,3 +1,5 @@
+3.3.0.0
+Added button in web page to convert videos to x265
 3.2.0.0
 Extended try-except block in database load
 Added video encoder command
@@ -11,7 +13,7 @@ Added save_folder parameter to downloader.download() method
 3.1.0.0
 Added support for inline queries (not finalized)
 Added support for bot handler at begin of commands
-Fixed bugs in commands 
+Fixed bugs in commands
 3.0.1.0
 Added clean.sh to gitignore
 Moved database_saver thread to bot.py

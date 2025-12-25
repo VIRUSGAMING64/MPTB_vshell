@@ -8,6 +8,7 @@ rm -r */*/*/.cph
 rm -r */*/*/*/__pycache__
 rm -r */*/*/*/.cph
 rm -r saved
+rm -r .cph  
 rm -r logs.txt
 rm -r env
 rm -r downloader.session*
