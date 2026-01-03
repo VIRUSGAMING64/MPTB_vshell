@@ -37,7 +37,7 @@ def only_dl_media(message:Message):
             print("Downloading media...")
             mess:Message=await_exec(message.reply_text,["Downloading media..."])
             user = base.get(message.from_user.id)
-            await_exec(
+            normal_exec(
                 dlbot.download_media,
                 [
                     pyrom(message),

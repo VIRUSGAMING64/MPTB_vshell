@@ -1,3 +1,4 @@
+from ast import arg
 import datetime
 import pstats
 import pyrogram.emoji as emojis
@@ -82,6 +83,10 @@ def t_user2peer(us:User):
     pw.path = f"env/{pw.name}-{pw.id}"
     pw.state = 0
     return pw
+
+
+def normal_exec(func,args):
+    func(*args)
 
 
 def await_exec(func,args, target_loop=None):
