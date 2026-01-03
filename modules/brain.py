@@ -37,7 +37,17 @@ def only_dl_media(message:Message):
             print("Downloading media...")
             mess:Message=await_exec(message.reply_text,["Downloading media..."])
             user = base.get(message.from_user.id)
-            dlbot.download_media(message=pyrom(message),progress=progress,progress_args=[0,mess,"downloading... "],file_name=user.path + "/")
+            await_exec(
+                dlbot.download_media,
+                [
+                    pyrom(message),
+                    user.path + "/",
+                    False,
+                    True,
+                    progress,
+                    [0,mess,"downloading... "]],
+            )
+
             await_exec(mess.edit_text, ["Media downloaded !!!"])       
         print(id)
     except Exception as e:

@@ -19,6 +19,7 @@ def loop_runner():
 th.Thread(target=loop_runner, daemon=True).start()
 
 def progress(count, total, speed = None, message:Message = None, label = "Downloading"):
+    print("progress called")
     progtext = f"{label}\n"
     if total == 0:
         por = 0
@@ -35,10 +36,7 @@ def progress(count, total, speed = None, message:Message = None, label = "Downlo
     if speed != None:
         progtext += f"Speed: {speed}/s"
 
-    if datetime.datetime.now().second % 2 == 0:
-        await_exec(message.edit_text,[progtext])
-
-
+    await_exec(message.edit_text,[progtext])
     print(progtext)
     return progtext
     
