@@ -267,7 +267,7 @@ def pyrom(message: Message):
         )
 
     return pyrogram.types.Message(
-        id=message.message_id,
+        id=message.id,
         date=message.date,
         chat=chat,
         from_user=from_user,

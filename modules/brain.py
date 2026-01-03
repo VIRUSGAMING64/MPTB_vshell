@@ -27,19 +27,21 @@ def only_up_media(message:Message):
 
 
 def only_dl_media(message:Message):
-    if message == None:
-        return
-    id = get_file_id(message)
-    if id == None:
-        await_exec(message.reply_text,["sorry contact with admin"])
-    else:
-        print("Downloading media...")
-        mess:Message=await_exec(message.reply_text,["Downloading media..."])
-        user = base.get(message.from_user.id)
-        dlbot.download_media(message=pyrom(message),progress=progress,progress_args=[0,mess,"downloading... "],file_name=user.path + "/")
-        await_exec(mess.edit_text, ["Media downloaded !!!"])       
-    print(id)
-
+    try:
+        if message == None:
+            return
+        id = get_file_id(message)
+        if id == None:
+            await_exec(message.reply_text,["sorry contact with admin"])
+        else:
+            print("Downloading media...")
+            mess:Message=await_exec(message.reply_text,["Downloading media..."])
+            user = base.get(message.from_user.id)
+            dlbot.download_media(message=pyrom(message),progress=progress,progress_args=[0,mess,"downloading... "],file_name=user.path + "/")
+            await_exec(mess.edit_text, ["Media downloaded !!!"])       
+        print(id)
+    except Exception as e:
+        await_exec(message.reply_text,[f"error downloading media: {e}"])
 
 def only_url(message):
     if message == None: return

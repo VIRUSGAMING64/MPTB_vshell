@@ -1,15 +1,18 @@
 import tarfile
 
 class Tar:
-    def __init__(self,name):
-        self.name = name
+    base:tarfile.TarFile = None
 
-    
+    def __init__(self,name, mode = "a"):
+        self.name = name
+        self.base = tarfile.TarFile(name, mode)
+        self.mode = mode
+
     def add(self,file):
-        pass
+        self.base.add(file)
 
     def pop(self,file):
-        pass
+        self.base.extract(file)
 
     def find(self,file):
         pass

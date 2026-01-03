@@ -12,7 +12,7 @@ def __init__(bot:Application):
             admin_user = newuser(admin)
             base.add(admin_user)
         admin_user.state = ADMIN | LLM
-        print(str(admin_user))
+        print(str(object=admin_user))
     print("=== init end ===")
 
 def __init_web__():
@@ -26,13 +26,14 @@ def database_saver():
 def __pyrodl__():
     while True:
         try:
-            if dlbot.is_connected:
+            if dlbot.is_connected == True:
                 break
             dlbot.start()
             break
         except Exception as e:
             print(e)
-            
+    print("downloader connected...")
+    
 th.Thread(target=database_saver,daemon = True).start()
 th.Thread(target=__pyrodl__,daemon = True).start()
 th.Thread(target=__init_web__,daemon = True).start()
