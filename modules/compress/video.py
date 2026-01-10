@@ -7,7 +7,7 @@ import gc
 
 class VideoCompressor():
     def __init__(self,filename = None,callback = None,args = [],parse_end=False):
-        self.base_cmd = 'ffmpeg -threads 1 -i "$in$" -c:v libx265 -preset fast -x265-params frame-threads=1:numa-pools=none "$out$"'
+        self.base_cmd = 'ffmpeg -i "$in$" -c:v libx265 -preset fast -x265-params frame-threads=1:numa-pools=none "$out$"'
         self.out = '$out$'  
         self.inp = '$in$'
         self.stop = False
