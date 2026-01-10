@@ -27,7 +27,7 @@ class VideoCompressor():
         th = Thread(target = self.stat_update)
         th.start()
         try:
-            subp.run(self.base_cmd, shell=True, stdout=subp.STDOUT, stderr=subp.STDOUT)
+            subp.run(self.base_cmd, shell=True)
         except Exception as e:
             print(f"video compress error [{e}]")    
 
@@ -45,6 +45,7 @@ class VideoCompressor():
         self.name = filename
         self.base_cmd=self.base_cmd.replace(self.inp,filename)
         self.base_cmd=self.base_cmd.replace(self.out, filename + ".comp.mp4")
+        print("=======================",self.base_cmd,"=======================")
         self.inp = filename
         self.out = filename + ".comp.mp4"
         return True
@@ -53,7 +54,8 @@ class VideoCompressor():
     def stat_update(self):
         while True:       
 
-            time.sleep(1)
+            time.sleep(3)
+
             if self.stop:
                 break
 

@@ -1,3 +1,5 @@
+3.5.1.3
+solved a problem compressing videos
 3.5.1.0
 Solve problem of space in compress video names
 Added dotenv to requirements.txt
