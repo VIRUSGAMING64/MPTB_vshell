@@ -211,7 +211,8 @@ commands            = {
     "/queues": queues,
     "/upload": upload,
     "/headers": headers,
-    "/x265": x265
+    "/x265": x265,
+    "/stats": stats
 }
 
 COMMANDS = commands.keys()

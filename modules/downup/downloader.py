@@ -1,6 +1,7 @@
 from threading import Thread
 import os
 import requests as rq
+import gc
 
 class downloader:
     def __init__(self,progress =  None,args = [],threads = 2):
@@ -46,6 +47,9 @@ class downloader:
                     written += len(chunk)
                     if single:
                         self.call(min(l + written, r + 1), r + 1, *self.args)
+            
+            gc.collect()
+            
         except Exception as e:
             print(f"download chunk error [{e}]")
 

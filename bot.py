@@ -1,3 +1,5 @@
+import dotenv
+dotenv.load_dotenv()
 from modules import *
 
 def __init_web__():
@@ -20,6 +22,7 @@ def __pyrodl__():
     normal_exec(dlbot.start,[])
     
 def __init__(bot:Application):
+    __pyrodl__()
     while not bot.running:
         time.sleep(TIMEOUT)
     
@@ -39,7 +42,6 @@ def __init__(bot:Application):
 
 th.Thread(target=database_saver,daemon = True).start()
 th.Thread(target=__init_web__,daemon = True).start()
-th.Thread(target=__pyrodl__,daemon = True).start()
 th.Thread(target=__init__,args=[bot],daemon = True).start()
 
 bot.add_handler(MessageHandler(filters.ALL,on_message))

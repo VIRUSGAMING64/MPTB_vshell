@@ -12,7 +12,9 @@ def only_message(message:Message):
     command = message.text
     if command.startswith(BOT_HANDLER + " "):
         command = command.removeprefix(BOT_HANDLER + " ")
+    
     print(f"processing message [{message.id}]")
+
     for com in COMMANDS:
         if message.text.startswith(com):
             commands[com](message,command)

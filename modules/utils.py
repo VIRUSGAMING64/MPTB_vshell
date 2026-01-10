@@ -1,14 +1,9 @@
-from ast import arg
-import datetime
-import pstats
 import pyrogram.emoji as emojis
 from telegram import *
 from modules.core.enums import *
 import asyncio
-import threading as th
 from modules.entity import *
 import time
-import psutil
 from modules.gvar import *
 
 def progress(count, total, speed = None, message:Message = None, label = "Downloading"):

@@ -1,3 +1,8 @@
+3.5.0.0
+added dotenv to automatic load of env
+added stats command
+removed unused imports
+optimized ffmpeg for memory
 3.4.0.0
 await_exec now need a loop not opcional
 deleteds all tests
