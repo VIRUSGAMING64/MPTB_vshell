@@ -35,9 +35,10 @@ def only_dl_media(message:Message):
             await_exec(message.reply_text,["sorry contact with admin"])
         else:
             print("Downloading media...")
-            mess:Message=await_exec(message.reply_text,["Downloading media..."])
+            mess:Message=await_exec(message.reply_text,["Downloading media..."], 
+        bot.bot_data['bot_loop'])
             user = base.get(message.from_user.id)
-            normal_exec(
+            await_exec(
                 dlbot.download_media,
                 [
                     pyrom(message),
@@ -45,18 +46,30 @@ def only_dl_media(message:Message):
                     False,
                     True,
                     progress,
-                    [0,mess,"downloading... "]],
+                    [0,mess,"downloading... "]
+                    ],
+                    dlbot.loop
+
             )
 
-            await_exec(mess.edit_text, ["Media downloaded !!!"])       
+            await_exec(mess.edit_text, ["Media downloaded !!!"],
+        bot.bot_data['bot_loop'])       
         print(id)
     except Exception as e:
-        await_exec(message.reply_text,[f"error downloading media: {e}"])
+        await_exec(message.reply_text,[f"error downloading media: {e}"],
+        bot.bot_data['bot_loop'])
 
 def only_url(message):
     if message == None: return
     if message.text == None: return
     url = message.text
+
+    for name,func in VIDEOS_URL:
+        if name in url:
+            func(url)
+            return
+
+
     mess = await_exec(message.reply_text,[f"Starting download from url: {url}"])
     user = base.get(message.from_user.id)
     down = downloader(progress, [0,mess,"downloading... "])
@@ -64,8 +77,8 @@ def only_url(message):
     down.download(url, user.path)
 
 
-def mainloop():
-    print("mainloop started")
+def main_handler():
+    print("main_handler started")
     while True:
         for que in [0,1,2,3]:
             mess:Message = actions.pop(que)
@@ -87,4 +100,4 @@ def mainloop():
         
         time.sleep(TIMEOUT)
 
-th.Thread(target=mainloop).start()
+th.Thread(target=main_handler).start()

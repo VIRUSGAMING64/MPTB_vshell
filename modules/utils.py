@@ -9,15 +9,7 @@ import threading as th
 from modules.entity import *
 import time
 import psutil
-
-loop = asyncio.new_event_loop()
-def loop_runner():
-    global loop
-    asyncio.set_event_loop(loop)
-    loop.run_forever()
-
-
-th.Thread(target=loop_runner, daemon=True).start()
+from modules.gvar import *
 
 def progress(count, total, speed = None, message:Message = None, label = "Downloading"):
     print("progress called")
@@ -37,7 +29,12 @@ def progress(count, total, speed = None, message:Message = None, label = "Downlo
     if speed != None:
         progtext += f"Speed: {speed}/s"
 
-    await_exec(message.edit_text,[progtext])
+    try:
+        await_exec(message.edit_text, [progtext], 
+        bot.bot_data['bot_loop'])
+    except Exception as e:
+        print(f"Error updating progress: {e}")
+    
     print(progtext)
     return progtext
     
@@ -89,29 +86,29 @@ def normal_exec(func,args):
     func(*args)
 
 
-def await_exec(func,args, target_loop=None):
-    global loop
-    if target_loop is None:
-        try:
-            from modules import gvar
-            if gvar.bot and hasattr(gvar.bot, 'bot_loop') and gvar.bot.bot_loop and gvar.bot.bot_loop.is_running():
-                target_loop = gvar.bot.bot_loop
-        except:
-            pass
+def await_exec(func,args,loop):
+    try:
+        if loop == None:
+            loop = asyncio.get_running_loop()
+    except RuntimeError as e:
+        loop = asyncio.new_event_loop()
+        print(e)
+        
+    asyncio.set_event_loop(loop)
 
-    use_loop = target_loop if target_loop else loop
     fut = asyncio.run_coroutine_threadsafe(
-        func(*args), use_loop
+        func(*args), 
+        loop
     )
+
     while fut.running():
         time.sleep(0.1)
-        print("awaiting...")
-
+    
     return fut.result()
 
-def getfullpath(args:str):
-    assert 0
 
+def getfullpath(args:str):
+    return os.path.realpath(args)
 
 def int2path(idx, user):
     try:
@@ -132,10 +129,11 @@ def int2path(idx, user):
     # Combine dirs and files to match 'ls' order
     items = dirs + files
     
-    if 0 <= idx < len(items):
+    if 0 <= idx and idx< len(items):
         return items[idx]
     
     return None
+
 
 def newuser(id):
     user2 = peer()

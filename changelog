@@ -1,3 +1,14 @@
+3.4.0.0
+await_exec now need a loop not opcional
+deleteds all tests
+all calls of await_exec added loop argument
+mainloop changed to main_handler
+removed loop_runner
+minor changes on gvar
+added enums for filesystem
+created template for videos downloader
+minor changes in peer class
+created template for a filesytem tree
 3.3.0.3
 Minor changes for repair download
 3.3.0.2

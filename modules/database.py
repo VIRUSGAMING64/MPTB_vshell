@@ -1,5 +1,6 @@
 from modules.entity import *
 from modules.core.enums import *
+
 class database:
     dic = { }
     

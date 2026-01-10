@@ -32,7 +32,6 @@ class downloader:
             print(f"error writing file [{e}]")
 
     def _download(self,url, l, r, filename, single = False):
-        # Descarga el rango [l, r] inclusive y lo escribe en offset l
         headers = {"Range": f"bytes={l}-{r}"}
         try:
             resp = rq.get(url, headers=headers, stream=True)
