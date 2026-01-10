@@ -27,7 +27,7 @@ class VideoCompressor():
         th = Thread(target = self.stat_update)
         th.start()
         try:
-            subp.run(self.base_cmd, shell=True, stdout=subp.DEVNULL, stderr=subp.DEVNULL)
+            subp.run(self.base_cmd, shell=True, stdout=subp.STDOUT, stderr=subp.STDOUT)
         except Exception as e:
             print(f"video compress error [{e}]")    
 
