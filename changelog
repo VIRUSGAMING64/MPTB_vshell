@@ -1,3 +1,5 @@
+3.5.0.1
+Added dotenv to requirements.txt
 3.5.0.0
 added dotenv to automatic load of env
 added stats command
