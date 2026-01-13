@@ -1,267 +1,389 @@
-<!DOCTYPEhtml>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Servidor FTP Web Simple</title>
-        <style>
-            :root {
-                --bg-color: #121212;
-                --container-bg: #1e1e1e;
-                --text-color: #e0e0e0;
-                --border-color: #333;
-                --accent-color: #64b5f6;
-                --btn-bg: #2196f3;
-                --btn-hover: #1976d2;
-                --danger-color: #f44336;
-            }
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-                max-width: 900px;
-                margin: 0 auto;
-                padding: 15px;
-                background-color: var(--bg-color);
-                color: var(--text-color);
-            }
-            .container {
-                background-color: var(--container-bg);
-                padding: 20px;
-                border-radius: 12px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servidor FTP Web Simple</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --container-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --border-color: #333;
+            --accent-color: #64b5f6;
+            --btn-bg: #2196f3;
+            --btn-hover: #1976d2;
+            --danger-color: #f44336;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 15px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        .container {
+            background-color: var(--container-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
         h1, h3 { color: #fff; }
-            .actions-bar {
-                display: flex;
-                gap: 15px;
-                margin-bottom: 20px;
-                flex-wrap: wrap;
-            }
-            .action-section {
-                flex: 1;
-                padding: 15px;
-                border: 1px solid var(--border-color);
-                border-radius: 8px;
+        .actions-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .action-section {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             background-color: rgba(255,255,255,0.02);
-            }
-            .file-list {
-                list-style: none;
-                padding: 0;
-            }
-            .file-item {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 12px 10px;
-                border-bottom: 1px solid var(--border-color);
-            }
+        }
+        .file-list {
+            list-style: none;
+            padding: 0;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
         .file-item:last-child { border-bottom: none; }
-            .file-info {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                flex: 1;
-                overflow: hidden;
-            }
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            overflow: hidden;
+        }
         .file-icon { font-size: 1.2em; min-width: 24px; text-align: center; }
-            .file-name {
-                word-break: break-all;
-                color: var(--text-color);
-                text-decoration: none;
-            }
+        .file-name {
+            word-break: break-all;
+            color: var(--text-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
         .file-name:hover { text-decoration: underline; }
-            .file-actions {
-                display: flex;
-                gap: 10px;
-            }
-            .btn {
-                background-color: var(--btn-bg);
-                color: white;
-                padding: 8px 16px;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 0.9em;
-                text-decoration: none;
-                display: inline-block;
-            }
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            background-color: var(--btn-bg);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            text-decoration: none;
+            display: inline-block;
+        }
         .btn:hover { background-color: var(--btn-hover); }
         .btn-danger { background-color: var(--danger-color); }
         .btn-danger:hover { background-color: #d32f2f; }
         .btn-sm { padding: 5px 10px; font-size: 0.8em; }
 
         input[type="text"], input[type="file"] {
-                padding: 8px;
-                border-radius: 4px;
-                border: 1px solid var(--border-color);
-                background-color: var(--bg-color);
-                color: var(--text-color);
-                margin-right: 10px;
-            }
-            .breadcrumb {
-                margin-bottom: 20px;
-                padding: 10px;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin-right: 10px;
+        }
+        .breadcrumb {
+            margin-bottom: 20px;
+            padding: 10px;
             background-color: rgba(255,255,255,0.05);
-                border-radius: 4px;
-            }
+            border-radius: 4px;
+        }
         .breadcrumb a { color: var(--accent-color); text-decoration: none; }
         .breadcrumb span { color: var(--text-color); }
 
-            .flash-messages {
-                margin-bottom: 20px;
-            }
-            .flash-message {
-                padding: 10px;
-                border-radius: 4px;
-                margin-bottom: 5px;
-            }
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash-message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
         .flash-success { background-color: rgba(76, 175, 80, 0.2); border: 1px solid #4caf50; }
         .flash-error { background-color: rgba(244, 67, 54, 0.2); border: 1px solid #f44336; }
 
-            @media (max-width: 600px) {
+        @media (max-width: 600px) {
             .actions-bar { flex-direction: column; }
             .file-item { flex-direction: column; align-items: flex-start; gap: 10px; }
             .file-actions { width: 100%; justify-content: flex-end; }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
         <h1>📂 Archivos Web FTP</h1>
 
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            <div class="flash-messages">
-                {% for category, message in messages %}
-                <div class="flash-message flash-{{ category }}">{{ message }}</div>
-                {% endfor %}
+        <div id="flash-messages" class="flash-messages"></div>
+
+        <div class="breadcrumb" id="breadcrumb">
+            <!-- Breadcrumb will be loaded here -->
+        </div>
+
+        <div class="actions-bar">
+            <div class="action-section">
+                <h3>Subir Archivo</h3>
+                <form id="uploadForm">
+                    <input type="file" name="file" required>
+                    <button type="submit" class="btn">Subir</button>
+                </form>
             </div>
-            {% endif %}
-            {% endwith %}
-
-            <div class="breadcrumb">
-                Ruta actual: <strong>/{{ current_path }}</strong>
-                {% if current_path %}
-                <a href="{{ url_for("index", path=current_path.rsplit("/", 1)[0] if "/" in current_path else "") }}" class="btn btn-sm" style="float: right;">⬆️ Subir nivel</a>
-                {% endif %}
+            <div class="action-section">
+                <h3>Crear Carpeta</h3>
+                <form id="createFolderForm">
+                    <input type="text" name="folder_name" placeholder="Nombre de carpeta" required>
+                    <button type="submit" class="btn">Crear</button>
+                </form>
             </div>
+        </div>
 
-            <div class="actions-bar">
-                <div class="action-section">
-                    <h3>Subir Archivo</h3>
-                <form action="{{ url_for("upload_file") }}" method="post" enctype="multipart/form-data">
-                        <input type="hidden" name="current_path" value="{{ current_path }}">
-                        <input type="file" name="file" required>
-                        <button type="submit" class="btn">Subir</button>
-                    </form>
-                </div>
-                <div class="action-section">
-                    <h3>Crear Carpeta</h3>
-                <form action="{{ url_for("create_folder") }}" method="post">
-                        <input type="hidden" name="current_path" value="{{ current_path }}">
-                        <input type="text" name="folder_name" placeholder="Nombre de carpeta" required>
-                        <button type="submit" class="btn">Crear</button>
-                    </form>
-                </div>
-            </div>
-
-            <ul class="file-list">
-                {% for folder in folders %}
-                <li class="file-item">
-                    <div class="file-info">
-                        <span class="file-icon">📁</span>
-                    <a href="{{ url_for("index", path=(current_path + "/" + folder) if current_path else folder) }}" class="file-name">{{ folder }}</a>
-                    </div>
-                    <div class="file-actions">
-                    <form action="{{ url_for("delete_item") }}" method="post" onsubmit="return confirm("¿Estás seguro de eliminar esta carpeta y todo su contenido?");">
-                            <input type="hidden" name="current_path" value="{{ current_path }}">
-                            <input type="hidden" name="item_name" value="{{ folder }}">
-                            <input type="hidden" name="item_type" value="folder">
-                            <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
-                        </form>
-                    </div>
-                </li>
-                {% endfor %}
-
-                {% for file in files %}
-                <li class="file-item">
-                    <div class="file-info">
-                        <span class="file-icon">📄</span>
-                        <span class="file-name">{{ file }}</span>
-                    </div>
-                    <div class="file-actions">
-                        <form action="{{ url_for("combert") }}" method="post">
-                            <input type="hidden" name="current_path" value="{{ current_path }}">
-                            <input type="hidden" name="item_name" value="{{ file }}">
-                            <input type="hidden" name="item_type" value="file">
-                            <button type="submit" class="btn btn-sm">X265</button>
-                        </form>
-                        <a href="{{ url_for("download_file", path=current_path, filename=file) }}"
-                            class="btn btn-sm">⬇️</a>
-                        <form action="{{ url_for("delete_item") }}" method="post" onsubmit="return confirm(" ¿Estás
-                            seguro de eliminar este archivo?");">
-                            <input type="hidden" name="current_path" value="{{ current_path }}">
-                            <input type="hidden" name="item_name" value="{{ file }}">
-                            <input type="hidden" name="item_type" value="file">
-                            <button type="submit" class="btn btn-danger btn-sm">🗑️</button>
-                        </form>
-                    </div>
-                </li>
-                {% endfor %}
-
-                {% if not folders and not files %}
-                <li class="file-item" style="justify-content: center; color: #666;">
-                    Carpeta vacía
-                </li>
-                {% endif %}
-            </ul>
+        <ul class="file-list" id="fileList">
+            <!-- Files will be loaded here -->
+        </ul>
+        
+        <div>
+            <hr style="border: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
             <div>
-                <hr style="border: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                <div>
-                    <span>Progreso de conversion: <span id="part">0</span>B/<span id="total">0</span>B</span>
-                </div>
-                <br>
-                <div>
-                    <span>Terminado: <span id="ok">NO</span>
-                </div>
-                <div>
-                    <div class="progressBar"
-                        style="width: 100%; height: 25px; border-radius: 1000px; background-color: #ffffff11; overflow: hidden; margin-top: 25px;">
-                        <div class="progress" style="width: 0px; height: 25px; background-color: #1976d2;">
-
-                        </div>
+                <span>Progreso de conversion: <span id="part">0</span>B/<span id="total">0</span>B</span>
+            </div>
+            <br>
+            <div>
+                <span>Terminado: <span id="okVal">NO</span></span>
+            </div>
+            <div>
+                <div class="progressBar"
+                    style="width: 100%; height: 25px; border-radius: 1000px; background-color: #ffffff11; overflow: hidden; margin-top: 25px;">
+                    <div class="progress" style="width: 0px; height: 25px; background-color: #1976d2;">
                     </div>
                 </div>
             </div>
         </div>
-        <script>
-            
+    </div>
 
-            var t;
+    <script>
+        let currentPath = new URLSearchParams(window.location.search).get('path') || '';
 
-   
+        function showMessage(message, type) {
+            const container = document.getElementById('flash-messages');
+            const div = document.createElement('div');
+            div.className = `flash-message flash-${type}`;
+            div.textContent = message;
+            container.appendChild(div);
+            setTimeout(() => {
+                div.remove();
+            }, 5000);
+        }
 
-            async function init() {
+        async function loadFiles() {
+            try {
+                const response = await fetch(`/api/list?path=${encodeURIComponent(currentPath)}`);
+                const data = await response.json();
                 
-                    await fetch('/combstats').then(res => res.json()).then(data => {
-                        const c = data.combertion;
-                        const total = c.total, part = c.part, ok = c.ok, percent = c.percent;
-
-                        document.querySelector('.progress').style.width = percent + '%';
-                        document.querySelector('#part').innerHTML = part;
-                        document.querySelector('#total').innerHTML = total;
-                        document.querySelector('#ok').innerHTML = ok;
-                        if (!ok){
-                            clearInterval(t)
-                        }
-                        console.log("progress")      
-            
-                    })  
+                if (!response.ok) {
+                    showMessage(data.error || 'Error loading files', 'error');
+                    return;
                 }
-            
-            
-            setInterval(init, 4000)
 
-        </script>
-    </body>
+                // Update Breadcrumb
+                let breadcrumbHtml = `Ruta actual: <strong>/${data.current_path ? data.current_path : ''}</strong>`;
+                if (data.current_path) {
+                    const parentPath = data.current_path.includes('/') ? data.current_path.substring(0, data.current_path.lastIndexOf('/')) : '';
+                    breadcrumbHtml += `<a href="#" onclick="navigate('${parentPath}'); return false;" class="btn btn-sm" style="float: right;">⬆️ Subir nivel</a>`;
+                }
+                document.getElementById('breadcrumb').innerHTML = breadcrumbHtml;
 
-    </html>
+                // Update File List
+                const list = document.getElementById('fileList');
+                list.innerHTML = '';
+
+                if (data.folders.length === 0 && data.files.length === 0) {
+                    list.innerHTML = '<li class="file-item" style="justify-content: center; color: #666;">Carpeta vacía</li>';
+                }
+
+                data.folders.forEach(folder => {
+                    const li = document.createElement('li');
+                    li.className = 'file-item';
+                    const newPath = data.current_path ? `${data.current_path}/${folder}` : folder;
+                    li.innerHTML = `
+                        <div class="file-info">
+                            <span class="file-icon">📁</span>
+                            <a href="#" onclick="navigate('${newPath}'); return false;" class="file-name">${folder}</a>
+                        </div>
+                        <div class="file-actions">
+                            <button onclick="deleteItem('${folder}', 'folder')" class="btn btn-danger btn-sm">🗑️</button>
+                        </div>
+                    `;
+                    list.appendChild(li);
+                });
+
+                data.files.forEach(file => {
+                    const li = document.createElement('li');
+                    li.className = 'file-item';
+                    li.innerHTML = `
+                        <div class="file-info">
+                            <span class="file-icon">📄</span>
+                            <span class="file-name">${file}</span>
+                        </div>
+                        <div class="file-actions">
+                            <button onclick="convertFile('${file}')" class="btn btn-sm">X265</button>
+                            <a href="/download?path=${encodeURIComponent(data.current_path)}&filename=${encodeURIComponent(file)}" class="btn btn-sm">⬇️</a>
+                            <button onclick="deleteItem('${file}', 'file')" class="btn btn-danger btn-sm">🗑️</button>
+                        </div>
+                    `;
+                    list.appendChild(li);
+                });
+
+            } catch (error) {
+                console.error(error);
+                showMessage('Error de conexión', 'error');
+            }
+        }
+
+        function navigate(path) {
+            currentPath = path;
+            const url = new URL(window.location);
+            if (path) {
+                url.searchParams.set('path', path);
+            } else {
+                url.searchParams.delete('path');
+            }
+            window.history.pushState({}, '', url);
+            loadFiles();
+        }
+
+        // Handle browser back/forward buttons
+        window.onpopstate = () => {
+            currentPath = new URLSearchParams(window.location.search).get('path') || '';
+            loadFiles();
+        };
+
+        // Upload File
+        document.getElementById('uploadForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            formData.append('current_path', currentPath);
+            
+            try {
+                const res = await fetch('/upload', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    showMessage(data.message, 'success');
+                    e.target.reset();
+                    loadFiles();
+                } else {
+                    showMessage(data.message || 'Error', 'error');
+                }
+            } catch (err) {
+                showMessage('Error uploading file', 'error');
+            }
+        };
+
+        // Create Folder
+        document.getElementById('createFolderForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            formData.append('current_path', currentPath);
+
+            try {
+                const res = await fetch('/create_folder', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    showMessage(data.message, 'success');
+                    e.target.reset();
+                    loadFiles();
+                } else {
+                    showMessage(data.message || 'Error', 'error');
+                }
+            } catch (err) {
+                showMessage('Error creating folder', 'error');
+            }
+        };
+
+        // Delete Item
+        async function deleteItem(name, type) {
+            if (!confirm(`¿Estás seguro de eliminar este ${type === 'folder' ? 'carpeta' : 'archivo'}?`)) return;
+            
+            const formData = new FormData();
+            formData.append('current_path', currentPath);
+            formData.append('item_name', name);
+            formData.append('item_type', type);
+
+            try {
+                const res = await fetch('/delete', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    showMessage(data.message, 'success');
+                    loadFiles();
+                } else {
+                    showMessage(data.message || 'Error', 'error');
+                }
+            } catch (err) {
+                showMessage('Error deleting item', 'error');
+            }
+        }
+
+        // Convert File
+        async function convertFile(name) {
+             const formData = new FormData();
+            formData.append('current_path', currentPath);
+            formData.append('item_name', name);
+            formData.append('item_type', 'file');
+
+             try {
+                const res = await fetch('/combert', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    showMessage(data.message, 'success');
+                } else {
+                    showMessage(data.message || 'Error', 'error');
+                }
+            } catch (err) {
+                showMessage('Error starting conversion', 'error');
+            }
+        }
+
+        // Conversion Statistics
+        var t;
+        async function initStats() {
+            try {
+                await fetch('/combstats').then(res => res.json()).then(data => {
+                    const c = data.combertion;
+                    const total = c.total, part = c.part, ok = c.ok, percent = c.percent;
+
+                    document.querySelector('.progress').style.width = percent + '%';
+                    document.querySelector('#part').innerHTML = part;
+                    document.querySelector('#total').innerHTML = total;
+                    document.querySelector('#okVal').innerHTML = ok;
+                    
+                    if (!ok){
+                        // Logic from previous code, though unclear what !ok implies exactly about polling.
+                        // I will assume it means "stop polling".
+                         clearInterval(t);
+                    }
+                }) 
+            } catch (e) { console.log(e); }
+        }
+
+        // Start
+        loadFiles();
+        t = setInterval(initStats, 4000);
+
+    </script>
+</body>
+</html>
