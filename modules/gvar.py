@@ -18,6 +18,7 @@ BOT_ID              = os.getenv("BOT_ID")
 PROXY_HTTP          = os.getenv("HTTP_PROXY") 
 PROXY_HTTPS         = os.getenv("HTTPS_PROXY") 
 BOT_HANDLER         = os.getenv("BOT_HANDLER","")
+NEXT_CLOUD_SHARED   = os.getenv("NEXT_CLOUD_SHARED")
 
 FUSE_GROUP_ID       = None #Ignored if fuse off
 DB_SAVE_TIMEOUT     = 60 #in seconds

@@ -13,9 +13,26 @@ from modules.fuse import *
 
 def put(message:Message,command:str):
     command = command.removeprefix('/put ')
-    res=requests.put(f"https://minube.uh.cu/public.php/dav/files/daYKRDxpKNWQARD/{command}",data=open(command,'rb'))
+    user = base.get(message.from_user.id)
+    if user.state & ADMIN == 0:
+        await_exec(
+            message.reply_text,
+            "You are not admin",
+            bot.bot_data['bot_loop']
+        )
+        return  
+    path = os.path.join(user.path,command)
+    if not os.path.exists(path) or not os.path.isfile(path): 
+        await_exec(
+            message.reply_text,
+            "File not found error",
+            bot.bot_data['bot_loop']
+        )
+        return
+    
+    res=requests.put(f"{NEXT_CLOUD_SHARED}/{command}",data=open(command,'rb'))
     await_exec(
         message.reply_text,
-        [f"File uploaded with status code {res.status_code} correct: 204"],
+        [f"File uploaded with status code {res.status_code} correct: 201"],
         bot.bot_data['bot_loop']
     )

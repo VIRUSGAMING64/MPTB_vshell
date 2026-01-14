@@ -145,7 +145,7 @@ def newuser(id):
 
 
 def _parse(user:peer, mess:Message)->peer:
-    if user.id and user.name != "...":
+    if user != None and user.id and user.name != "...":
         return user
     
     if user == None:
