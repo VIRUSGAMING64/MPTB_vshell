@@ -197,7 +197,8 @@ commands = {
     "/headers":     headers,
     "/x265":        x265,
     "/stats":       stats,
-    "/cd":          cd 
+    "/cd":          cd,
+    "/put":         put
 }
 
 COMMANDS = commands.keys()

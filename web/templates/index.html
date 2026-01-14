@@ -160,21 +160,20 @@
             <!-- Files will be loaded here -->
         </ul>
         
-        <div>
-            <hr style="border: none; border-bottom: 1px solid rgba(255,255,255,0.1);">
-            <div>
-                <span>Progreso de conversion: <span id="part">0</span>B/<span id="total">0</span>B</span>
+        <div class="action-section" style="margin-top: 20px; border-color: var(--accent-color);">
+            <h3 style="margin-top: 0; color: var(--accent-color);">🚀 Estado de Conversión</h3>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9em;">
+                <span>Completado: <strong id="percentText" style="color: var(--accent-color);">0%</strong></span>
+                <span style="font-family: monospace; color: #aaa;"><span id="part">0</span> / <span id="total">0</span></span>
             </div>
-            <br>
-            <div>
-                <span>Terminado: <span id="okVal">NO</span></span>
-            </div>
-            <div>
-                <div class="progressBar"
-                    style="width: 100%; height: 25px; border-radius: 1000px; background-color: #ffffff11; overflow: hidden; margin-top: 25px;">
-                    <div class="progress" style="width: 0px; height: 25px; background-color: #1976d2;">
-                    </div>
+            
+            <div class="progressBar"
+                style="width: 100%; height: 12px; border-radius: 6px; background-color: rgba(255,255,255,0.1); overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);">
+                <div class="progress" style="width: 0%; height: 100%; background-color: var(--accent-color); transition: width 0.3s ease; box-shadow: 0 0 10px var(--accent-color);">
                 </div>
+            </div>
+             <div style="margin-top: 5px; font-size: 0.8em; text-align: right; display:none;">
+                <span>Terminado: <span id="okVal">NO</span></span>
             </div>
         </div>
     </div>
@@ -363,23 +362,30 @@
 
         // Conversion Statistics
         var t;
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
         async function initStats() {
             try {
-                await fetch('/combstats').then(res => res.json()).then(data => {
-                    const c = data.combertion;
-                    const total = c.total, part = c.part, ok = c.ok, percent = c.percent;
+                const res = await fetch('/combstats');
+                const data = await res.json();
+                const c = data.combertion;
+                const total = c.total;
+                const part = c.part;
+                const percent = c.percent;
 
-                    document.querySelector('.progress').style.width = percent + '%';
-                    document.querySelector('#part').innerHTML = part;
-                    document.querySelector('#total').innerHTML = total;
-                    document.querySelector('#okVal').innerHTML = ok;
-                    
-                    if (!ok){
-                        // Logic from previous code, though unclear what !ok implies exactly about polling.
-                        // I will assume it means "stop polling".
-                         clearInterval(t);
-                    }
-                }) 
+                document.querySelector('.progress').style.width = percent + '%';
+                document.getElementById('part').innerText = formatBytes(part);
+                document.getElementById('total').innerText = formatBytes(total);
+                document.getElementById('percentText').innerText = percent.toFixed(1) + '%';
+                
             } catch (e) { console.log(e); }
         }
 

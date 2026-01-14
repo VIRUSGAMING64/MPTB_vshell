@@ -120,7 +120,7 @@ def int2path(idx, user):
             dirs.append(di)
         else:
             files.append(di)
-            
+
     items = dirs + files
     
     if 0 <= idx and idx < len(items):
@@ -145,7 +145,7 @@ def newuser(id):
 
 
 def _parse(user:peer, mess:Message)->peer:
-    if user.id:
+    if user.id and user.name != "...":
         return user
     
     if user == None:
