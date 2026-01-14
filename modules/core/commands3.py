@@ -29,7 +29,13 @@ def put(message:Message,command:str):
             bot.bot_data['bot_loop']
         )
         return
-    res=requests.put(f"{NEXT_CLOUD_SHARED}/{command}",data=open(path,'rb'),stream=True)
+
+    def file_iter(file_path):
+        with open(file_path, 'rb') as f:
+            while chunk := f.read(65536):
+                yield chunk
+
+    res=requests.put(f"{NEXT_CLOUD_SHARED}/{command}",data=file_iter(path),stream=True)
     await_exec(
         message.reply_text,
         [f"File uploaded with status code {res.status_code} correct: 201"],

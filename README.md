@@ -1,88 +1,108 @@
 # 🤖 MPTB_vshell
 
-**MPTB_vshell** es un framework de bot de Telegram modular y robusto, diseñado para integrar la potencia de **OpenAI (ChatGPT)** con capacidades avanzadas de gestión de medios. Su arquitectura flexible permite una fácil extensión y personalización.
+**MPTB_vshell** is a robust and modular Telegram bot framework designed to integrate the power of **OpenAI (ChatGPT)** with advanced media management capabilities. Its flexible architecture allows for easy extension and customization.
 
-## 🚀 Características Principales
+## 🚀 Key Features
 
-- **🤖 Integración Profunda con Telegram**: Construido sobre `python-telegram-bot` para una interacción fluida y reactiva.
-- **🧠 Inteligencia Artificial**: Soporte nativo para **OpenAI (ChatGPT)**, permitiendo conversaciones naturales y procesamiento de lenguaje.
-- **📂 Gestión de Medios Avanzada**: Descarga y subida de archivos grandes y gestión de medios utilizando la eficiencia de `Pyrogram`.
-- **👤 Sistema de Usuarios y Roles**: Gestión completa de usuarios, estados y permisos (Admin, Usuario, Banned, etc.).
-- **🧩 Arquitectura Modular**: Código organizado en módulos independientes (`brain`, `core`, `downup`, etc.) para facilitar el mantenimiento y la escalabilidad.
-- **💾 Persistencia de Datos**: Sistema de base de datos simple pero efectivo para mantener el estado.
+- **🤖 Deep Telegram Integration**: Built on `python-telegram-bot` for fluid and reactive interaction.
+- **🧠 Artificial Intelligence**: Native support for **OpenAI (ChatGPT)**, enabling natural conversations and language processing.
+- **📂 Advanced Media Management**: Download and upload large files with `Pyrogram` efficiency.
+- **🎬 Media Compression**: Built-in video compression capabilities leveraging **FFmpeg** (H.265/HEVC).
+- **🌐 Web Interface**: Integrated Flask-based web dashboard for file management (`web/app.py`).
+- **🐳 Docker Ready**: Includes a configured `Dockerfile` with all dependencies and optimizations (jemalloc).
+- **👤 User & Role System**: Complete management of users, states, and permissions (Admin, User, Banned, etc.).
+- **🧩 Modular Architecture**: Code organized into independent modules (`brain`, `core`, `downup`, `compress`, etc.) for easy maintenance and scalability.
+- **💾 Data Persistence**: Simple yet effective database system to maintain state.
 
-## 📋 Requisitos
+## 📋 Requirements
 
-- 🐍 **Python 3.8** o superior.
-- 📱 Una cuenta de **Telegram** y un **Bot Token** (obtenido de @BotFather).
-- 🔑 **API ID** y **API Hash** de Telegram (para Pyrogram, obtenible en my.telegram.org).
-- 🤖 **OpenAI API Key** (opcional, para funcionalidades de IA).
+- 🐍 **Python 3.8** or higher.
+- 🎬 **FFmpeg** (Required for media processing).
+- 📱 A **Telegram** account and a **Bot Token** (obtained from @BotFather).
+- 🔑 **Telegram API ID** & **API Hash** (for Pyrogram, get it from my.telegram.org).
+- 🤖 **OpenAI API Key** (optional, for AI features).
 
-## 🛠️ Instalación
+## 🛠️ Installation
 
-1. **Clona el repositorio:**
+### Option A: Local Installation
+
+1. **Clone the repository:**
    ```bash
-   git clone <url-del-repositorio>
+   git clone <repository-url>
    cd MPTB_vshell
    ```
 
-2. **Crea un entorno virtual (recomendado):**
+2. **Create a virtual environment (recommended):**
    ```bash
    python -m venv .venv
-   source .venv/bin/activate  # En Linux/Mac
-   # .venv\Scripts\activate  # En Windows
+   source .venv/bin/activate  # On Linux/Mac
+   # .venv\Scripts\activate  # On Windows
    ```
 
-3. **Instala las dependencias:**
+3. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
+   *Note: Ensure `ffmpeg` is installed on your system if you plan to use media features.*
 
-## ⚙️ Configuración
+### Option B: Docker (Recommended)
 
-El bot utiliza variables de entorno para su configuración. Puedes establecerlas en tu sistema o crear un archivo `.env` (si usas una librería para cargarlo) o exportarlas antes de ejecutar.
+1. **Build the image:**
+   ```bash
+   docker build -t mptb_vshell .
+   ```
 
-Las variables requeridas son:
+2. **Run the container:**
+   ```bash
+   docker run -d --env-file .env --name mptb_vshell mptb_vshell
+   ```
 
-| Variable | Descripción |
+## ⚙️ Configuration
+
+The bot uses environment variables for configuration. You can set them in your system, create a `.env` file, or pass them to Docker.
+
+Required variables:
+
+| Variable | Description |
 |----------|-------------|
-| `TOKEN` | Token del bot de Telegram. |
-| `API_ID` | ID de aplicación de Telegram. |
-| `API_HASH` | Hash de la API de Telegram. |
-| `OPEN_AI` | Clave de API de OpenAI. |
-| `ADMIN` | ID numérico del administrador principal. |
-| `HTTP_PROXY` | (Opcional) Proxy HTTP. |
-| `HTTPS_PROXY` | (Opcional) Proxy HTTPS. |
+| `TOKEN` | Telegram Bot Token. |
+| `API_ID` | Telegram Application ID. |
+| `API_HASH` | Telegram API Hash. |
+| `OPEN_AI` | OpenAI API Key. |
+| `ADMIN` | Numerical ID of the main administrator. |
+| `HTTP_PROXY` | (Optional) HTTP Proxy. |
+| `HTTPS_PROXY` | (Optional) HTTPS Proxy. |
 
-## ▶️ Uso
+## ▶️ Usage
 
-Una vez configurado, inicia el bot con el siguiente comando:
+Once configured, start the bot with the following command:
 
 ```bash
 python bot.py
 ```
 
-## 📂 Estructura del Proyecto
+## 📂 Project Structure
 
 ```text
 MPTB_vshell/
-├── bot.py                  # 🚀 Punto de entrada principal del bot
-├── clean.sh                # 🧹 Script de limpieza de archivos temporales
-├── database.csv            # 💾 Base de datos simple (CSV)
-├── requirements.txt        # 📦 Lista de dependencias
-├── runtests.py             # 🧪 Script para ejecutar pruebas
-├── modules/                # 🧩 Lógica modular del bot
-│   ├── brain.py            # 🧠 Cerebro: Procesamiento de mensajes
-│   ├── chatgpt.py          # 🤖 IA: Integración con OpenAI
-│   ├── database.py         # 🗄️ DB: Manejo de base de datos
-│   ├── gvar.py             # ⚙️ Config: Variables globales y entorno
-│   ├── utils.py            # 🛠️ Utils: Herramientas varias
-│   ├── core/               # ⚡ Core: Comandos, colas y workers
-│   ├── downup/             # 📥📤 DownUp: Descarga y subida de medios
-│   ├── entity/             # 👤 Entity: Definición de objetos (User, etc.)
-│   └── fuse/               # 🔌 Fuse: Módulos adicionales/experimentales
-├── web/                    # 🌐 Web: Interfaz web de administración
-│   ├── web.py
-│   └── src/
-└── tests/                  # 🧪 Tests: Pruebas unitarias
+├── bot.py                  # 🚀 Main bot entry point
+├── clean.sh                # 🧹 Script to clean temporary files
+├── database.csv            # 💾 Simple database (CSV)
+├── Dockerfile              # 🐳 Docker configuration
+├── requirements.txt        # 📦 Dependency list
+├── modules/                # 🧩 Modular bot logic
+│   ├── brain.py            # 🧠 Brain: Message processing
+│   ├── chatgpt.py          # 🤖 AI: OpenAI integration
+│   ├── database.py         # 🗄️ DB: Database handling
+│   ├── gvar.py             # ⚙️ Config: Global variables & env
+│   ├── utils.py            # 🛠️ Utils: Various tools
+│   ├── compress/           # 🎬 Compress: Video compression logic
+│   ├── core/               # ⚡ Core: Commands, queues, and workers
+│   ├── downup/             # 📥📤 DownUp: Media download & upload
+│   ├── entity/             # 👤 Entity: Object definitions (User, etc.)
+│   └── fuse/               # 🔌 Fuse: Additional/experimental modules
+└── web/                    # 🌐 Web: Administration web interface
+    ├── app.py              # 🌐 Flask application
+    ├── static/             # 🎨 Static assets
+    └── templates/          # 📄 HTML templates
 ```
