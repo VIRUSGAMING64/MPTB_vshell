@@ -1,3 +1,11 @@
+3.6.0.0
+fix bug in _parse (creating user in any case)
+Created preview for Tar compression
+Fix bug in headers
+Added cd command
+Addeds templates in tree.py
+Created utils for fuse
+Minor changes in webpage
 3.5.2.0
 Added favicon
 Fixed video compression route to return JSON response

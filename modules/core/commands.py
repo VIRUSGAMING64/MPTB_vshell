@@ -2,7 +2,7 @@ from modules.core.commands2 import *
 
 
 def headers(message:Message,command:str):
-    url = command
+    url = command.removeprefix("/headers ").strip()
     response = requests.head(url)
     await_exec(
         message.reply_text,
@@ -32,6 +32,7 @@ def kill(message:Message,command:str):
 
 def getid(message:Message,command:str):
     await_exec(message.reply_text,[f"Your ID: {message.from_user.id}"], bot.bot_data['bot_loop'])
+
 def help_bot(message:Message,command:str): 
     await_exec(
         message.reply_text,
@@ -117,7 +118,7 @@ def mkdir(message:Message,command:str):
     
 
 def size(message:Message,command:str):
-    args = command
+    args = command.removeprefix("/size ")
     user = base.get(message.from_user.id)
     if args.isnumeric():
         args = int2path(int(args),user)
@@ -129,11 +130,12 @@ def size(message:Message,command:str):
         await_exec(message.reply_text, [f"path not found {args}"], bot.bot_data['bot_loop'])
         return
     size = os.path.getsize(args)    
-    await_exec(message.reply_text,{f"the size is: {size}"}, bot.bot_data['bot_loop'])
+    await_exec(message.reply_text,[f"the size is: {size}"], bot.bot_data['bot_loop'])
 
 
 def su_state(message:Message,command:str):
     user = base.get(message.from_user.id)
+    print(user.path)
     if not user.id in ADMINS_ID:
         await_exec(message.reply_text,["access denied [not admin]"],
         bot.bot_data['bot_loop'])
@@ -176,43 +178,26 @@ def banuser(message:Message,command:str):
         bot.bot_data['bot_loop'])
 
 
-def queues(message:Message,command:str):
-    user = base.get(message.from_user.id)
-    if not user.id in ADMINS_ID:
-        await_exec(message.reply_text,["access denied [not admin]"], bot.bot_data['bot_loop'])
-        return
-    mes = f"""running actions: {runner.running}"""
-    mes+= f"Messages: {len(actions.messages)}"
-    mes+= f"Urls: {len(actions.url)}"
-    mes+= f"Donwload media: {actions.download_media}"
-    mes+= f"Upload: {actions.upload_media}"    
-
-def upload(message:Message,command:str):
-    command
-    await_exec(message.reply_text, ["upload pushed to queue"],
-        bot.bot_data['bot_loop'])
-    actions.upload_media.append(message)
-
-
-commands            = {
-    "/start": start,
-    "/help": help_bot,
-    "/upload": upload,
-    "/kill": kill,
-    "/ls": ls,
-    "/mkdir": mkdir,
-    "/rm": rm,
-    "/ren": ren,
-    "/comp": comp,
-    "/size": size,
-    "/getid": getid,
-    "/su_state": su_state,
-    "/banuser": banuser,
-    "/queues": queues,
-    "/upload": upload,
-    "/headers": headers,
-    "/x265": x265,
-    "/stats": stats
+commands = {
+    "/start":       start,
+    "/help":        help_bot,
+    "/upload":      upload,
+    "/kill":        kill,
+    "/ls":          ls,
+    "/mkdir":       mkdir,
+    "/rm":          rm,
+    "/ren":         ren,
+    "/comp":        comp,
+    "/size":        size,
+    "/getid":       getid,
+    "/su_state":    su_state,
+    "/banuser":     banuser,
+    "/queues":      queues,
+    "/upload":      upload,
+    "/headers":     headers,
+    "/x265":        x265,
+    "/stats":       stats,
+    "/cd":          cd 
 }
 
 COMMANDS = commands.keys()

@@ -5,23 +5,35 @@ class Tar:
 
     def __init__(self,name, mode = "a"):
         self.name = name
-        self.base = tarfile.TarFile(name, mode)
         self.mode = mode
+        self.base = None
+        self.open()
 
     def add(self,file):
-        self.base.add(file)
+        if self.base:
+            self.base.add(file)
 
     def pop(self,file):
-        self.base.extract(file)
+        if self.base:
+            self.base.extract(file)
 
     def find(self,file):
-        pass
+        if self.base:
+            try:
+                self.base.getmember(file)
+                return True
+            except KeyError:
+                return False
+        return False
 
     def save(self,file):
-        pass
+        self.add(file)
 
     def open(self):
-        pass
+        if self.base is None:
+            self.base = tarfile.open(self.name, self.mode)
 
     def close(self):
-        pass
+        if self.base:
+            self.base.close()
+            self.base = None

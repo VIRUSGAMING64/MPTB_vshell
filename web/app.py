@@ -1,5 +1,6 @@
 from ast import parse
 import os
+import psutil
 from pickle import FALSE
 import shutil
 from flask import Flask, request, redirect, url_for, send_from_directory, jsonify, make_response
@@ -164,6 +165,18 @@ def combert():
     
     Thread(target=comp.compress,daemon=True).start()
     return jsonify({'success': True, 'message': 'Conversion iniciada'})
+
+@app.route('/api/ffmpeg-status')
+def ffmpeg_status():
+    ffmpeg_running = False
+    for proc in psutil.process_iter(['name']):
+        try:
+            if proc.info['name'] and 'ffmpeg' in proc.info['name'].lower():
+                ffmpeg_running = True
+                break
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+    return jsonify({'running': ffmpeg_running})
 
 
 try:

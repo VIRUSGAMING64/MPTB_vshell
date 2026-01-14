@@ -121,10 +121,9 @@ def int2path(idx, user):
         else:
             files.append(di)
             
-    # Combine dirs and files to match 'ls' order
     items = dirs + files
     
-    if 0 <= idx and idx< len(items):
+    if 0 <= idx and idx < len(items):
         return items[idx]
     
     return None
@@ -146,6 +145,9 @@ def newuser(id):
 
 
 def _parse(user:peer, mess:Message)->peer:
+    if user.id:
+        return user
+    
     if user == None:
         user = t_user2peer(mess.from_user)
         base.add(user)

@@ -128,7 +128,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>📂 Archivos Web FTP</h1>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>📂 Archivos Web FTP</h1>
+            <span id="ffmpeg-indicator" style="padding: 5px 10px; border-radius: 4px; background-color: #666; font-weight: bold; font-size: 0.9em; color: #ccc;">FFmpeg: ...</span>
+        </div>
 
         <div id="flash-messages" class="flash-messages"></div>
 
@@ -383,6 +386,34 @@
         // Start
         loadFiles();
         t = setInterval(initStats, 4000);
+
+        // FFmpeg Status Monitor
+        async function updateFfmpegStatus() {
+            try {
+                const response = await fetch('/api/ffmpeg-status');
+                if (response.ok) {
+                    const data = await response.json();
+                    const indicator = document.getElementById('ffmpeg-indicator');
+                    if (data.running) {
+                        indicator.textContent = 'FFmpeg: EJECUTANDO';
+                        indicator.style.backgroundColor = '#4caf50'; // Green
+                        indicator.style.color = '#fff';
+                        indicator.style.boxShadow = '0 0 5px #4caf50';
+                    } else {
+                        indicator.textContent = 'FFmpeg: DETENIDO';
+                        indicator.style.backgroundColor = '#424242'; // Dark gray
+                        indicator.style.color = '#aa';
+                        indicator.style.boxShadow = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching ffmpeg stats:', error);
+            }
+        }
+
+        // Check every 3 seconds
+        setInterval(updateFfmpegStatus, 3000);
+        updateFfmpegStatus();
 
     </script>
 </body>
