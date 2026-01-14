@@ -35,7 +35,7 @@ def put(message:Message,command:str):
             while chunk := f.read(65536):
                 yield chunk
 
-    res=requests.put(f"{NEXT_CLOUD_SHARED}/{command}",data=file_iter(path),stream=True)
+    res=requests.put(f"{NEXT_CLOUD_SHARED}/{command}",data=file_iter(path))
     await_exec(
         message.reply_text,
         [f"File uploaded with status code {res.status_code} correct: 201"],
