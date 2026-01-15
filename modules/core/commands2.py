@@ -102,13 +102,6 @@ def comp(message:Message, command:str):
     except Exception as e:
         await_exec(message.reply_text, [f"Error: {e}"], bot.bot_data['bot_loop'])
 
-
-def split(message:Message, command:str):
-    pass  
-
-def ren(message:Message, command:str):
-    args = command
-
 def x265(message:Message, command:str):
     filename = command.removeprefix('/x265 ')
     message = await_exec(message.reply_text,["encoding..."])

@@ -1,3 +1,5 @@
+3.8.0.0
+Added split command to split files in parts
 3.7.0.3
 try to fix status code 500 in put command
 3.7.0.2

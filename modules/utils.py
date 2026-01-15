@@ -6,6 +6,14 @@ from modules.entity import *
 import time
 from modules.gvar import *
 
+
+def lz_fill(num, size=3):
+    s_num = str(num)
+    while len(s_num) < size:
+        s_num = "0" + s_num
+    return s_num
+
+
 def progress(count, total, speed = None, message:Message = None, label = "Downloading"):
     print("progress called")
     progtext = f"{label}\n"
@@ -156,12 +164,6 @@ def _parse(user:peer, mess:Message)->peer:
         user.name = mess.from_user.username
     
     user.path = f"env/{user.name}-{user.id}"
-    
-    if not os.path.exists(user.path):
-        try:
-            os.makedirs(user.path, exist_ok=True)
-        except Exception as e:
-            print(f"Error creating directory {user.path}: {e}")
             
     return user
 

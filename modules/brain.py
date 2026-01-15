@@ -88,7 +88,15 @@ def main_handler():
                 continue
             user:peer = base.get(mess.from_user.id)
             user = _parse(user,mess)
+                
+            if not os.path.exists(user.path):
+                try:
+                    os.makedirs(user.path, exist_ok=True)
+                except Exception as e:
+                    print(f"Error creating directory {user.path}: {e}")
+
             print(str(user))
+            
             if user.state & BANNED:
                 continue
             if que == 0:

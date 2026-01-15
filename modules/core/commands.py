@@ -198,7 +198,8 @@ commands = {
     "/x265":        x265,
     "/stats":       stats,
     "/cd":          cd,
-    "/put":         put
+    "/put":         put,
+    "/split":       split
 }
 
 COMMANDS = commands.keys()
