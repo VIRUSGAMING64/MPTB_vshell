@@ -19,7 +19,7 @@ PROXY_HTTP          = os.getenv("HTTP_PROXY")
 PROXY_HTTPS         = os.getenv("HTTPS_PROXY") 
 BOT_HANDLER         = os.getenv("BOT_HANDLER","")
 NEXT_CLOUD_SHARED   = os.getenv("NEXT_CLOUD_SHARED")
-
+YTDLP_COOKIES       = os.getenv("YTDLP_COOKIES",None)
 FUSE_GROUP_ID       = None #Ignored if fuse off
 DB_SAVE_TIMEOUT     = 60 #in seconds
 
@@ -37,6 +37,7 @@ base                = database()
 VIDEOS_URL          = [
     ["instagram",insta_downloader],
     ["youtube", youtube_downloader],
+    ["youtu.be", youtube_downloader],
     ["facebook",face_downloader]
 ]
 

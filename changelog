@@ -1,3 +1,8 @@
+3.9.0.0
+Added support for youtube video downloads
+Added command to load ytdlp cookies from a file
+Major cahnges in progress function
+Testing youtube downloads
 3.8.0.0
 Added split command to split files in parts
 3.7.0.3

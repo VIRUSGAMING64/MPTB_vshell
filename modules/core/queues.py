@@ -96,10 +96,13 @@ class MessageQueue():
             return
         if command.startswith(BOT_HANDLER+" "):
             command = command.removeprefix(BOT_HANDLER+" ")
+
         if command.startswith("http://") or command.startswith("https://"):
             self.url.append(message)
             return
+        
         print("pushed message")
+        
         self.messages.append(message)
 
     def pop(self,queue_index):

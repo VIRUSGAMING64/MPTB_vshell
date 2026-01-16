@@ -25,7 +25,7 @@ def only_message(message:Message):
 def only_up_media(message:Message):
     if message == None:
         return
-    await_exec(message.reply_text,["sorry not implemented"])
+    await_exec(message.reply_text,["sorry not implemented"], bot.bot_data["bot_loop"])
 
 
 def only_dl_media(message:Message):
@@ -61,14 +61,15 @@ def only_dl_media(message:Message):
         await_exec(message.reply_text,[f"error downloading media: {e}"],
         bot.bot_data['bot_loop'])
 
+
 def only_url(message):
     if message == None: return
     if message.text == None: return
     url = message.text
-
+    user = base.get(message.from_user.id)
     for name,func in VIDEOS_URL:
         if name in url:
-            func(url)
+            func(url,user,dlbot,message.chat.id,progress,[0,message,"downloading... "])
             return
 
 
@@ -103,7 +104,7 @@ def main_handler():
                 runner.add(only_message,[mess])
             elif que == 1:
                 runner.add(only_dl_media,[mess])
-            elif que == 3:
+            elif que == 2:
                 runner.add(only_up_media,[mess])
             else:
                 runner.add(only_url,[mess])

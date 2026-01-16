@@ -1,3 +1,4 @@
+import json
 import requests
 import time
 from modules.compress.comp import Tar
@@ -117,6 +118,46 @@ def split(message:Message, command:str):
             [f"Error during splitting: {e}"],
             bot.bot_data['bot_loop']
         )
+
+
+def load_cookie(message:Message, command:str):
+    command = command.removeprefix('/load_cookie ')
+    user = base.get(message.from_user.id)
+    if user.state & ADMIN == 0:
+        await_exec(
+            message.reply_text,
+            ["You are not admin"],
+            bot.bot_data['bot_loop']
+        )
+        return
+    path = os.path.join(user.path, command)
+    if not os.path.exists(path) or not os.path.isfile(path):
+        await_exec(
+            message.reply_text,
+            ["File not found"],
+            bot.bot_data['bot_loop']
+        )
+        return
+    try:
+        with open(path, 'r') as f:
+            cookies = f.read()
+            cookies = json.loads(cookies)
+            global YTDLP_COOKIES
+            YTDLP_COOKIES = cookies
+
+        await_exec(
+            message.reply_text,
+            ["Cookie loaded successfully"],
+            bot.bot_data['bot_loop']
+        )
+    except Exception as e:
+        await_exec(
+            message.reply_text,
+            [f"Error loading cookie: {e}"],
+            bot.bot_data['bot_loop']
+        )
+
+
 
 
 def ren(message:Message, command:str):

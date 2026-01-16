@@ -1,3 +1,4 @@
+from datetime import datetime
 import pyrogram.emoji as emojis
 from telegram import *
 from modules.core.enums import *
@@ -14,23 +15,67 @@ def lz_fill(num, size=3):
     return s_num
 
 
+def humanbytes(size):
+    if not size:
+        return "0 B"
+    power = 2**10
+    n = 0
+    units = {0: '', 1: 'Ki', 2: 'Mi', 3: 'Gi', 4: 'Ti'}
+    while size > power:
+        size /= power
+        n += 1
+    return f"{round(size, 2)} {units[n]}B"
+
+
+def time_formatter(seconds: int) -> str:
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    days, hours = divmod(hours, 24)
+    tmp = ((str(days) + "d, ") if days else "") + \
+        ((str(hours) + "h, ") if hours else "") + \
+        ((str(minutes) + "m, ") if minutes else "") + \
+        ((str(seconds) + "s") if seconds else "")
+    return tmp.strip().strip(",")
+
+
 def progress(count, total, speed = None, message:Message = None, label = "Downloading"):
     print("progress called")
-    progtext = f"{label}\n"
-    if total == 0:
-        por = 0
-        print("total is 0!!!   :()")
-    else:
-        por = ((count * 100) / total) / 10
+    if datetime.now().second % 3 <= 1:
+        return
+    
+    percentage = count * 100 / total if total > 0 else 0
+    
+    por = percentage / 10
     color = emojis.RED_CIRCLE
     if por > 4:
         color = emojis.ORANGE_CIRCLE
     if por > 7:
         color = emojis.GREEN_CIRCLE
-    progtext += f"{color}" * int(por) + f"{emojis.WHITE_CIRCLE}" * (10 - int(por))
-    progtext += f"\n{por * 10}%\n"
-    if speed != None:
-        progtext += f"Speed: {speed}/s"
+    
+    filled = int(por)
+    bar = f"{color}" * filled + f"{emojis.WHITE_CIRCLE}" * (10 - filled)
+    
+    current = humanbytes(count)
+    tot = humanbytes(total)
+
+    speed_text = ""
+    eta_text = ""
+    if speed:
+        try:
+            spd_val = float(speed)
+            speed_text = f"{humanbytes(spd_val)}/s"
+            if spd_val > 0 and total > 0:
+                remain = total - count
+                eta = remain / spd_val
+                eta_text = f" | ⏳ {time_formatter(int(eta))}"
+        except (ValueError, TypeError):
+            speed_text = f"{speed}/s"
+
+    progtext = f"{label}\n"
+    progtext += f"{bar} {percentage:.2f}%\n"
+    progtext += f"⚡ {current} / {tot}\n"
+    if speed_text:
+        progtext += f"🚀 {speed_text}{eta_text}"
 
     try:
         await_exec(message.edit_text, [progtext], 
