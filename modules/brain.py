@@ -6,6 +6,14 @@ from telegram import *
 from modules.entity import *
 from modules.utils import _parse
 
+from modules.downup.videos import *
+VIDEOS_URL          = [
+    ["instagram",insta_downloader],
+    ["youtube", youtube_downloader],
+    ["youtu.be", youtube_downloader],
+    ["facebook",face_downloader]
+]
+
 def only_message(message:Message):
     if message == None:
         return

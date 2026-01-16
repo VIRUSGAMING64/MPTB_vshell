@@ -7,7 +7,6 @@ import openai
 import httpx
 import asyncio
 from modules.database import database
-from modules.downup.videos import *
 
 TOKEN               = os.getenv("TOKEN")
 API_HASH            = os.getenv("API_HASH")
@@ -33,13 +32,6 @@ sender              = None
 main_bot_loop       = None
 base                = database()
 
-
-VIDEOS_URL          = [
-    ["instagram",insta_downloader],
-    ["youtube", youtube_downloader],
-    ["youtu.be", youtube_downloader],
-    ["facebook",face_downloader]
-]
 
 PROXYES             = {
   "http": PROXY_HTTP,
