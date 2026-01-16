@@ -48,7 +48,7 @@ def split(message:Message, command:str):
     command = command.removeprefix('/split ')
     user    = base.get(message.from_user.id)
     try:
-        name    = command.split(" ",1)[0]
+        name    = command.rsplit(" ",1)[0]
         size_mb = command.rsplit(" ",1)[1]
     except Exception as e:
         await_exec(
@@ -75,6 +75,7 @@ def split(message:Message, command:str):
         return
     
     target_path = os.path.join(user.path, name)
+    print(target_path)
     if not os.path.exists(target_path) or not os.path.isfile(target_path):
         await_exec(
             message.reply_text,
