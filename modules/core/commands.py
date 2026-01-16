@@ -48,7 +48,7 @@ def ls(message:Message,command:str):
     except FileNotFoundError:
         await_exec(message.reply_text, ["Directory not found"],
         bot.bot_data['bot_loop'])
-        return
+        return  
 
     files = []
     dirs = []

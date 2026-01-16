@@ -56,7 +56,7 @@ async def post_init(app):
     print(main_bot_loop)
 
 if TOKEN != None and API_ID != None and API_HASH != None:
-    bot = Application.builder().token(TOKEN).proxy(PROXY_HTTP).post_init(post_init).build()
+    bot = Application.builder().token(TOKEN).proxy(PROXY_HTTP).post_init(post_init).pool_timeout(10).build()
     sender = bot.bot
     dlbot = pyrogram.Client(
         name= "downloader",
