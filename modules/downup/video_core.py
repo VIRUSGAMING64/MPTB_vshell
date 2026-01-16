@@ -7,8 +7,8 @@ from modules.gvar import *
 class VidDownloader:
     file = ""
     arg = "downloading video"
-    def __init__(self, bot:Client,user,chat_id,progress:callable,args:list):
-        self.bot = bot
+    def __init__(self, used_bot:Client,user,chat_id,progress:callable,args:list):
+        self.used_bot = used_bot
         self.user = user
         self.progress = progress
         self.args = args
@@ -24,34 +24,41 @@ class VidDownloader:
         self.progress(curr,total,*self.args)
 
     def download_video(self, url):
-        self.download_id = await_exec(
-            self.bot.send_message,
-            [self.chat_id,"Starting download"],
-            self.bot.loop
-        )
-        if YTDLP_COOKIES != None:
-            with open("cookies.txt","w") as f:
-                f.write(YTDLP_COOKIES)
-                f.close()
+        try:
+            self.download_id = await_exec(
+                self.used_bot.send_message,
+                [self.chat_id,"Starting download"],
+                self.used_bot.loop
+            )
+            if YTDLP_COOKIES != None:
+                with open("cookies.txt","w") as f:
+                    f.write(YTDLP_COOKIES)
+                    f.close()
 
-        ydl_opts = {
-            "paths":{
-                "home":self.user.path
-            },
-            "cookiefile":"cookies.txt" if YTDLP_COOKIES != None else None,
-            'format': 'best',
-            "writesubtitles":True,
-            "subtitleslangs":["es","en"],
-            'writethumbnail': True,
-            'progress_hooks': [self.my_hook],
-        }
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            try:
-                ydl.download([url])
-            except Exception as e:
-                await_exec(
-                    self.bot.edit_message_text,
-                    [self.chat_id,self.download_id,"unknow error\n"+str(e)],
-                    self.bot.loop
-                )
-            self.download_id = -1
+            ydl_opts = {
+                "paths":{
+                    "home":self.user.path
+                },
+                "cookiefile":"cookies.txt" if YTDLP_COOKIES != None else None,
+                'format': 'best',
+                "writesubtitles":True,
+                "subtitleslangs":["es","en"],
+                'writethumbnail': True,
+                'progress_hooks': [self.my_hook],
+            }
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                try:
+                    ydl.download([url])
+                except Exception as e:
+                    await_exec(
+                        self.used_bot.edit_message_text,
+                        [self.chat_id,self.download_id,"unknow error\n"+str(e)],
+                        self.used_bot.loop
+                    )
+                self.download_id = -1
+        except Exception as e:
+            await_exec(
+                self.used_bot.edit_message_text,
+                [self.chat_id,self.download_id,"error starting download\n"+str(e)],
+                self.used_bot.loop
+            )

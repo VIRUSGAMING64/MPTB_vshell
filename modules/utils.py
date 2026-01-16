@@ -1,3 +1,4 @@
+
 from datetime import datetime
 import pyrogram.emoji as emojis
 from telegram import *
@@ -6,7 +7,6 @@ import asyncio
 from modules.entity import *
 import time
 from modules.gvar import *
-
 
 def lz_fill(num, size=3):
     s_num = str(num)
@@ -39,9 +39,8 @@ def time_formatter(seconds: int) -> str:
 
 
 def progress(count, total, speed = None, message:Message = None, label = "Downloading"):
+    
     print("progress called")
-    if datetime.now().second % 3 <= 1:
-        return
     
     percentage = count * 100 / total if total > 0 else 0
     
@@ -76,10 +75,13 @@ def progress(count, total, speed = None, message:Message = None, label = "Downlo
     progtext += f"⚡ {current} / {tot}\n"
     if speed_text:
         progtext += f"🚀 {speed_text}{eta_text}"
-
+    import modules.gvar as gvar
     try:
-        await_exec(message.edit_text, [progtext], 
-        bot.bot_data['bot_loop'])
+        await_exec(
+            message.edit_text, 
+            [progtext], 
+            gvar.bot.bot_data['bot_loop']
+        )
     except Exception as e:
         print(f"Error updating progress: {e}")
     
