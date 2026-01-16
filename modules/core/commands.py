@@ -199,7 +199,8 @@ commands = {
     "/stats":       stats,
     "/cd":          cd,
     "/put":         put,
-    "/split":       split
+    "/split":       split,
+    "/load_cookie": load_cookie,
 }
 
 COMMANDS = commands.keys()

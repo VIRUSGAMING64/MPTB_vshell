@@ -1,3 +1,6 @@
+3.9.0.1
+Added command to dict
+Added support for ytdlp subtitles
 3.9.0.0
 Added support for youtube video downloads
 Added command to load ytdlp cookies from a file

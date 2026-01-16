@@ -40,6 +40,8 @@ class VidDownloader:
             },
             "cookiefile":"cookies.txt" if YTDLP_COOKIES != None else None,
             'format': 'best',
+            "writesubtitles":True,
+            "subtitleslangs":["es","en"],
             'writethumbnail': True,
             'progress_hooks': [self.my_hook],
         }
