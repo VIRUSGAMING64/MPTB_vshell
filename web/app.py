@@ -3,11 +3,12 @@ import os
 import psutil
 from pickle import FALSE
 import shutil
-from flask import Flask, request, redirect, url_for, send_from_directory, jsonify, make_response
+from flask import Flask, request, redirect, url_for, send_from_directory, jsonify, make_response, session, flash, render_template
 from modules.compress.video import *
+from functools import wraps
 
 app = Flask(import_name=__name__, static_folder='static', template_folder='templates')
-# app.secret_key = 'supersecretkey' # No longer needed without flash
+app.secret_key = 'supersecretkey'
 UPLOAD_FOLDER = 'env'
 app.config['UPLOAD_FOLDER'] = os.path.realpath(UPLOAD_FOLDER)
 TOTAL = 0
@@ -15,26 +16,66 @@ PART  = 0
 OK    = True
 
 # Asegurarse de que la carpeta de subidas existe
-BASE_DIR =  app.config['UPLOAD_FOLDER']
-os.makedirs(BASE_DIR, exist_ok=True)
+# BASE_DIR estara dinamico dependiendo del usuario
+GLOBAL_BASE_DIR = app.config['UPLOAD_FOLDER']
+os.makedirs(GLOBAL_BASE_DIR, exist_ok=True)
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def get_base_dir():
+    if 'folder' in session:
+         return os.path.join(GLOBAL_BASE_DIR, session['folder'])
+    return GLOBAL_BASE_DIR # Fallback or for public if intended, but we will protect routes
 
 def get_safe_path(req_path):
+    base_dir = get_base_dir()
     # Normalizar y asegurar que el path esté dentro de BASE_DIR
     if not req_path:
         req_path = ''
     # Eliminar barras iniciales para evitar que se interprete como root absoluto
     req_path = req_path.lstrip('/')
-    abs_path = os.path.abspath(os.path.join(BASE_DIR, req_path))
-    print(abs_path)
-    if not abs_path.startswith(BASE_DIR):
-        return BASE_DIR, ''
+    abs_path = os.path.abspath(os.path.join(base_dir, req_path))
+    # print(abs_path)
+    if not abs_path.startswith(base_dir):
+        return base_dir, ''
     return abs_path, req_path
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        folder_name = f"{username}-{password}"
+        user_folder = os.path.join(GLOBAL_BASE_DIR, folder_name)
+        
+        if os.path.exists(user_folder):
+             session['user'] = username
+             session['folder'] = folder_name
+             return redirect(url_for('index'))
+        else:
+             flash('Cuenta no creada aun en el bot')
+
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    session.pop('folder', None) 
+    return redirect(url_for('login'))
+
 @app.route('/')
+@login_required
 def index():
-    return send_from_directory('templates', 'index.html')
+    return render_template('index.html', username=session.get('user'))
 
 @app.route('/api/list')
+@login_required
 def list_files():
     req_path = request.args.get('path', '')
     abs_path, rel_path = get_safe_path(req_path)
@@ -65,6 +106,7 @@ def list_files():
     })
 
 @app.route('/create_folder', methods=['POST'])
+@login_required
 def create_folder():
     current_path = request.form.get('current_path', '')
     folder_name = request.form.get('folder_name')
@@ -79,6 +121,7 @@ def create_folder():
             
     return jsonify({'success': False, 'message': 'Nombre de carpeta requerido'}), 400
 
+@login_required
 @app.route('/delete', methods=['POST'])
 def delete_item():
     current_path = request.form.get('current_path', '')
@@ -99,6 +142,7 @@ def delete_item():
     return jsonify({'success': False, 'message': 'Nombre de item requerido'}), 400
 
 
+@login_required
 @app.route('/upload', methods=['POST'])
 def upload_file():
     current_path = request.form.get('current_path', '')
@@ -119,6 +163,7 @@ def upload_file():
         
     return jsonify({'success': False, 'message': 'Error desconocido'}), 500
 
+@login_required
 @app.route('/download')
 def download_file():
     req_path = request.args.get('path', '')
@@ -136,6 +181,7 @@ def update_stat(total,part,ok):
     PART = part
     OK = ok
 
+@login_required
 @app.route("/combstats",methods = ["GET"])
 def combstats():
     global TOTAL,PART,OK
@@ -149,6 +195,7 @@ def combstats():
             "ok": OK
         }
     }
+@login_required
 
 @app.route("/combert",methods = ['POST'])
 def combert():
@@ -165,6 +212,7 @@ def combert():
     
     Thread(target=comp.compress,daemon=True).start()
     return jsonify({'success': True, 'message': 'Conversion iniciada'})
+@login_required
 
 @app.route('/api/ffmpeg-status')
 def ffmpeg_status():

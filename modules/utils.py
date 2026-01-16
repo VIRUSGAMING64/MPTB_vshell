@@ -8,12 +8,6 @@ from modules.entity import *
 import time
 from modules.gvar import *
 
-def lz_fill(num, size=3):
-    s_num = str(num)
-    while len(s_num) < size:
-        s_num = "0" + s_num
-    return s_num
-
 
 def humanbytes(size):
     if not size:

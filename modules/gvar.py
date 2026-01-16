@@ -6,11 +6,13 @@ import os
 import openai
 import httpx
 import asyncio
+
 from modules.database import database
 
 TOKEN               = os.getenv("TOKEN")
 API_HASH            = os.getenv("API_HASH")
 OPEN_AI_API_KEY     = os.getenv("OPEN_AI")
+GEMINI_API_KEY      = os.getenv("GEMINI_API_KEY")
 API_ID              = os.getenv("API_ID")
 MANAGER_ID          = os.getenv("ADMIN")
 BOT_ID              = os.getenv("BOT_ID")
@@ -26,6 +28,7 @@ ADMINS_ID           = []
 DEBUG_ID            = []
 
 model               = None
+gemini_model        = None
 dlbot               = None
 bot                 = None
 sender              = None  
@@ -47,7 +50,6 @@ if MANAGER_ID != None:
 
 if OPEN_AI_API_KEY != None:
     model = openai.OpenAI(api_key=OPEN_AI_API_KEY,http_client=httpx.Client(proxy=PROXY_HTTP))
-
 
 async def post_init(app):
     global main_bot_loop

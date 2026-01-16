@@ -48,8 +48,8 @@ def split(message:Message, command:str):
     command = command.removeprefix('/split ')
     user    = base.get(message.from_user.id)
     try:
-        name    = command.split(" ")[0]
-        size_mb = command.split(" ")[1]
+        name    = command.split(" ",1)[0]
+        size_mb = command.rsplit(" ",1)[1]
     except Exception as e:
         await_exec(
             message.reply_text,
@@ -98,7 +98,7 @@ def split(message:Message, command:str):
                 if not chunk:
                     break
 
-                part_filename = f"{target_path}.{lz_fill(i)}"
+                part_filename = f"{target_path}.{str(i).zfill(3)}"
                 with open(part_filename, 'ab') as part_file:
                     part_file.write(chunk)
                 if l == size_bytes:

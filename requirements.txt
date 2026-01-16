@@ -8,3 +8,5 @@ flask
 psutil
 dotenv
 yt_dlp
+google-generativeai
+google

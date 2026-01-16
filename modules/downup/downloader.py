@@ -19,7 +19,7 @@ class downloader:
         headers = {"Range":f"bytes={l}-{r}"}
         resp = rq.get(url,headers=headers,stream=True)
         for chunk in resp.iter_content(chunk_size=8192):    
-            data += chunk
+            data.join(chunk)
 
         return data
     

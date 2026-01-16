@@ -50,7 +50,7 @@ class database:
     
             while tx != "":
                 tx = file.read(1024*1024)
-                data += tx
+                data.join(tx)   
     
             data=data.split("\n")
             for raw_user in data:

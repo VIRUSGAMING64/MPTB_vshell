@@ -24,6 +24,14 @@
             background-color: var(--bg-color);
             color: var(--text-color);
         }
+        #neuron-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
         .container {
             background-color: var(--container-bg);
             padding: 20px;
@@ -127,10 +135,17 @@
     </style>
 </head>
 <body>
+    <canvas id="neuron-canvas"></canvas>
     <div class="container">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <h1>📂 Archivos Web FTP</h1>
-            <span id="ffmpeg-indicator" style="padding: 5px 10px; border-radius: 4px; background-color: #666; font-weight: bold; font-size: 0.9em; color: #ccc;">FFmpeg: ...</span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span id="ffmpeg-indicator" style="padding: 5px 10px; border-radius: 4px; background-color: #666; font-weight: bold; font-size: 0.9em; color: #ccc;">FFmpeg: ...</span>
+                {% if username %}
+                    <span style="color: var(--accent-color);">{{ username }}</span>
+                    <a href="/logout" class="btn btn-danger btn-sm" style="text-decoration: none;">Salir</a>
+                {% endif %}
+            </div>
         </div>
 
         <div id="flash-messages" class="flash-messages"></div>
@@ -422,5 +437,6 @@
         updateFfmpegStatus();
 
     </script>
+    <script src="/static/neuron.js"></script>
 </body>
 </html>
