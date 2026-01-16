@@ -141,10 +141,9 @@ def load_cookie(message:Message, command:str):
     try:
         with open(path, 'r') as f:
             cookies = f.read()
-            cookies = json.loads(cookies)
             global YTDLP_COOKIES
             YTDLP_COOKIES = cookies
-
+            
         await_exec(
             message.reply_text,
             ["Cookie loaded successfully"],
