@@ -33,7 +33,7 @@ def put(message:Message,command:str):
 
     def file_iter(file_path):
         with open(file_path, 'rb') as f:
-            while chunk := f.read(65536):
+            while chunk := f.read(1024*1024 * 16):
                 yield chunk
 
     res=requests.put(f"{NEXT_CLOUD_SHARED}/{command}",data=file_iter(path))
