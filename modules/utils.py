@@ -214,6 +214,21 @@ def _parse(user:peer, mess:Message)->peer:
     return user
 
 
+def response_to_json(response):
+    content = None
+    try:
+        content = response.json()
+    except:
+        content = response.text
+    
+    return {
+        "status_code": response.status_code,
+        "reason": response.reason,
+        "url": response.url,
+        "headers": dict(response.headers),
+        "content": content
+    }
+
 
 def pyrom(message: Message):
     import pyrogram

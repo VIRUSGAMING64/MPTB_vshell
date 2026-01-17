@@ -1,3 +1,5 @@
+3.11.0.1
+Added function return response as json in /put command
 3.11.0.0
 Fixed python 3.14 problems 
 Fixed problems in /put

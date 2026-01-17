@@ -42,7 +42,13 @@ def put(message:Message,command:str):
         [f"File uploaded with status code {res.status_code} correct: 201"],
         bot.bot_data['bot_loop']
     )
-
+    if int(res.status_code) == 201:
+        return 
+    await_exec(
+        message.reply_text,
+        [response_to_json(res)],
+        bot.bot_data['bot_loop']
+    )
 
 def split(message:Message, command:str):
     command = command.removeprefix('/split ')
