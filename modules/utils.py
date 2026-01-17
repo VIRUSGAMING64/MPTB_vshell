@@ -142,6 +142,9 @@ def await_exec(func,args,loop):
         
     asyncio.set_event_loop(loop)
 
+    if not isinstance(args, (list, tuple)):
+        args = (args,)
+
     fut = asyncio.run_coroutine_threadsafe(
         func(*args), 
         loop

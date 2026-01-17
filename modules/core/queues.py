@@ -30,14 +30,15 @@ class Pool():
 
             if args == None:
                 func()
-            func(*args)   
+            else:
+                func(*args)   
             
             self.lock.acquire()
             self.running -= 1
             self.lock.release()
 
         except Exception as e:
-            raise f"Thread pool exception [{e}]" 
+            raise Exception(f"Thread pool exception [{e}]") 
 
     def _run(self):
         while True:

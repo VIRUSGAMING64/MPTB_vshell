@@ -24,6 +24,7 @@ def gpt(message:Message):
             max_output_tokens=10000,
             tools=[]    #todo add tool for web browsing 
         )    
+        
         res = response.output_text.replace("\\n","\n")
         await_exec(message.reply_text,[res])
     except Exception as e:

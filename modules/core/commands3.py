@@ -18,7 +18,7 @@ def put(message:Message,command:str):
     if user.state & ADMIN == 0:
         await_exec(
             message.reply_text,
-            "You are not admin",
+            ["You are not admin"],
             bot.bot_data['bot_loop']
         )
         return  
@@ -26,7 +26,7 @@ def put(message:Message,command:str):
     if not os.path.exists(path) or not os.path.isfile(path): 
         await_exec(
             message.reply_text,
-            "File not found error",
+            ["File not found error"],
             bot.bot_data['bot_loop']
         )
         return
