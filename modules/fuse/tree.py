@@ -1,5 +1,8 @@
-
 import datetime
+from operator import le
+
+import pyrogram
+from pyrogram.types import Message
 from modules.core.enums import *
 from pyrogram import Client
 
@@ -10,55 +13,104 @@ class fsinfo:
     parent_id   = None
     bot:Client  = None
     cache_fold  = None
-    save_at     = None     #ID of group
     max_size    = 1024*1024*16#MB
     size        = 0
     created_at  = 0
-    updated_at  = 0
 
     def check(self):
         if self.bot == None:
             raise "python bot not assigned"
         
-        if self.max_size > 1024*1024*1024*2: #2GB
+        if self.max_size > 1024*1024*2000:#MB 
             raise "max size too large"
 
-        if self.save_at == None: #2GB
-            raise "save at group not assigned"
-
-
-
 class file(fsinfo):
-    def __init__(self):
-        self.type    = FILE
-        self.chunks  = [] #id of others chunks
-        self.pointer = 0
-        self.root    = 0
-    
+    def __init__(self,bot,gid,mode = "wb"):
+        self.pointer  = 0
+        self.root     = 0
+        self.tmp_size = 0
+        self.curr_id  = 0
+        self.chunks   = []
+        self.type     = FILE
+        self.bot      = bot
+        self.gid      = gid
+        self.mode     = mode
+        self.curr     = open("tmp",mode)
+
     def __str__(self):
-        mess += f"{self.type},{self.name},{self.id},{self.created_at},{self.size}"
+        mess = f"{self.type},{self.name},{self.id},{self.created_at},{self.size}"
         for i in self.chunks:
             mess += f",{i}"
         return mess
 
+
     def getFileOf(self,idx):
         return idx // self.max_size
 
+
+    def download(self,id):
+        pass #TODO
+
     def read(self,count):
         self.check()
+        if self.mode != "rb":
+            raise "Mode error, try in another mode"
+        
+        R = self.getFileOf(count)
+
+        while count > 0:
+            pass #TODO
+
 
     def write(self,reader):
         self.check()
+        if self.mode != "wb":
+            raise "Mode error, try in another mode"
+        
+        if self.tmp_size + len(reader) > self.max_size:
+            res = self.max_size - self.tmp_size
+            self.curr.write(reader[:res])
+            self.curr.close()
+            self.save_file("tmp")
+            self.curr = open("tmp","wb")
+            wdata = reader[res:]
+            self.write(wdata)
+            self.size += len(wdata)
+            return
+
+        self.curr.write(reader)
+        self.tmp_size += len(reader)
+        self.size += len((reader))
+
+    def save_file(self,path):
+        sent:pyrogram.types.Message = self.bot.send_document(
+            chat_id=self.gid,
+            document=path,
+            caption=f"file:{self.name},part:{len(self.chunks)+1}"
+        )
+        self.chunks.append(sent.id)
+        self.tmp_size = 0
 
     def get_size(self):
         self.check()
 
     def close(self):
-        pass
+        self.curr.close()
+        if self.tmp_size > 0:
+            self.save_file("tmp")
+        self.save()
 
     def save(self):
-        pass
-
+        if self.tmp_size > 0:
+            raise "temp file not saved yet"
+        f=open("tmp.meta","wb")
+        f.write(str(self).encode())
+        f.close()
+        self.id = self.bot.send_document(
+            chat_id=self.gid,
+            document="tmp.meta",
+            caption=f"file:{self.name}.meta"
+        ).id
 
 class folder(fsinfo):
     def __init__(self,base=None):
@@ -81,7 +133,6 @@ class folder(fsinfo):
             res = fold.find(target=target)
             if res != None:
                 return res
-            
         return None
 
     def push_file(self,file):

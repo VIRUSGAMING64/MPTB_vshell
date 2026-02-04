@@ -10,7 +10,8 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     libjemalloc2 \
     && rm -rf /var/lib/apt/lists/*
-
+    
+RUN pip install setuptools
 # Configurar jemalloc como administrador de memoria para reducir fragmentación
 ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2
 

@@ -1,16 +1,4 @@
-import json
-import requests
-import time
-from modules.compress.comp import Tar
-from modules.compress.video import VideoCompressor
-from modules.core.queues import *
-from modules.gvar import *
-import os
-import psutil
-from modules.utils import *
-import asyncio
-import threading as th
-from modules.fuse import *
+from modules.core.commands4 import *
 
 def put(message:Message,command:str):
     command = command.removeprefix('/put ')
@@ -36,7 +24,10 @@ def put(message:Message,command:str):
             while chunk := f.read(1024*1024 * 16):
                 yield chunk
 
-    res=requests.put(f"{NEXT_CLOUD_SHARED}/{command}",data=file_iter(path))
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/115.0'
+    }
+    res=requests.put(f"{NEXT_CLOUD_SHARED}/{command}",data=file_iter(path), headers=headers)
     await_exec(
         message.reply_text,
         [f"File uploaded with status code {res.status_code} correct: 201"],
@@ -164,8 +155,39 @@ def load_cookie(message:Message, command:str):
         )
 
 
-
-
 def ren(message:Message, command:str):
     command = command.removeprefix('/ren ')
     user = base.get(message.from_user.id)
+    command = command.split(",")
+    try:
+        old = command[0]
+        new = command[1]
+    except Exception as e: 
+        await_exec(
+            message.reply_text,
+            ["Usage: /ren old_filename,new_filename"],
+            bot.bot_data['bot_loop']
+        )
+        return
+    old_path = os.path.join(user.path, old)
+    new_path = os.path.join(user.path, new)
+    if not os.path.exists(old_path):
+        await_exec(
+            message.reply_text,
+            ["Old file not found"],
+            bot.bot_data['bot_loop']
+        )
+        return
+    try:
+        os.rename(old_path, new_path)
+        await_exec(
+            message.reply_text,
+            [f"Renamed {old} to {new}"],
+            bot.bot_data['bot_loop']
+        )
+    except Exception as e:
+        await_exec(
+            message.reply_text,
+            [f"Error renaming file: {e}"],
+            bot.bot_data['bot_loop']
+        )     

@@ -1,3 +1,8 @@
+3.12.0.0
+fixed dockerfile
+Added load_cookie command
+Added rename file command
+Created File class in fuse (no read file)
 3.11.0.2
 Updated chunksize in /put command to 16MB
 3.11.0.1
