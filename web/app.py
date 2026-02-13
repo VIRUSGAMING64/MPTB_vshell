@@ -3,6 +3,7 @@ import os
 import psutil
 from pickle import FALSE
 import shutil
+from threading import Thread
 from flask import Flask, request, redirect, url_for, send_from_directory, jsonify, make_response, session, flash, render_template
 from modules.compress.video import *
 from functools import wraps
@@ -15,10 +16,69 @@ TOTAL = 0
 PART  = 0
 OK    = True
 
-# Asegurarse de que la carpeta de subidas existe
-# BASE_DIR estara dinamico dependiendo del usuario
 GLOBAL_BASE_DIR = app.config['UPLOAD_FOLDER']
 os.makedirs(GLOBAL_BASE_DIR, exist_ok=True)
+
+# --- Queue System ---
+import threading
+import time
+
+class QueueManager:
+    def __init__(self):
+        self.queue = [] # List of dicts: {'path': str, 'callback': func}
+        self.current_task = None
+        self.lock = threading.Lock()
+        self.stop_event = threading.Event()
+        self.worker_thread = threading.Thread(target=self._worker, daemon=True)
+        self.worker_thread.start()
+
+    def add_task(self, file_path, callback):
+        with self.lock:
+            if any(item['path'] == file_path for item in self.queue):
+                return False, "Ya está en la cola"
+            if self.current_task and self.current_task['path'] == file_path:
+                return False, "Ya se está procesando"
+            
+            self.queue.append({'path': file_path, 'callback': callback})
+            return True, "Añadido a la cola"
+
+    def get_status(self):
+        with self.lock:
+            return {
+                'queue': [os.path.basename(item['path']) for item in self.queue],
+                'current': os.path.basename(self.current_task['path']) if self.current_task else None,
+                'is_processing': self.current_task is not None
+            }
+
+    def _worker(self):
+        global OK, TOTAL, PART
+        while not self.stop_event.is_set():
+            task = None
+            with self.lock:
+                if self.queue and not self.current_task:
+                    task = self.queue.pop(0)
+                    self.current_task = task
+            
+            if task:
+                TOTAL = 0
+                PART = 0
+                
+                path = task['path']
+                callback = task['callback']
+                print(f"Queue Worker: Starting {path}")
+                try:
+                    comp = VideoCompressor(path, callback, parse_end=True)
+                    comp.compress()
+                except Exception as e:
+                    print(f"Queue Worker Error processing {path}: {e}")
+                finally:
+                    with self.lock:
+                        self.current_task = None
+            else:
+                time.sleep(1)
+
+queue_manager = QueueManager()
+
 
 def login_required(f):
     @wraps(f)
@@ -187,12 +247,19 @@ def combstats():
     global TOTAL,PART,OK
     if TOTAL == 0:
         TOTAL = 1
+    
+    status = queue_manager.get_status()
+    # OK variable means "Is IDLE/Finished". So it is opposite of is_processing
+    is_idle = not status['is_processing']
+
     return {
         "combertion":{
             "total":TOTAL,
             "part": PART,
             "percent": PART/TOTAL * 100,
-            "ok": OK
+            "ok": is_idle,
+            "queue": status['queue'],
+            "current": status['current']
         }
     }
 @login_required
@@ -204,14 +271,20 @@ def combert():
     item_name    = request.form.get('item_name')
     item_type    = request.form.get('item_type') # 'file' or 'folder'
 
-    if OK == False:
-         return jsonify({'success': False, 'message': 'Conversion en progreso'}), 400
+    # Normalize path
+    try:
+        infile, _ = get_safe_path(os.path.join(current_path, item_name))
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error de ruta: {str(e)}'}), 400
+
+    # infile is absolute path
+    added, msg = queue_manager.add_task(infile, update_stat)
     
-    infile, _    = get_safe_path(os.path.join(current_path, item_name))
-    comp         = VideoCompressor(infile, update_stat,parse_end=True)
-    
-    Thread(target=comp.compress,daemon=True).start()
-    return jsonify({'success': True, 'message': 'Conversion iniciada'})
+    if added:
+        return jsonify({'success': True, 'message': msg})
+    else:
+        return jsonify({'success': False, 'message': msg}), 400
+
 @login_required
 
 @app.route('/api/ffmpeg-status')

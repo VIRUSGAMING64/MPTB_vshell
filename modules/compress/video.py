@@ -4,10 +4,13 @@ import subprocess as subp
 from threading import Thread
 import gc
 
-
+ffmpeg_threads       = os.getenv("ffmpeg_threads", 1)
+ffmpeg_preset        = os.getenv("preset","fast")
+ffmpeg_frame_threads = os.getenv("ffmpeg_freme_threads", 1)
+numa                 = os.getenv("numa",":numa-pools=none") 
 class VideoCompressor():
     def __init__(self,filename = None,callback = None,args = [],parse_end=False):
-        self.base_cmd = 'ffmpeg -threads 1 -i "$in$" -c:v libx265 -preset fast -x265-params frame-threads=1:numa-pools=none "$out$"'
+        self.base_cmd = f'ffmpeg -threads {ffmpeg_threads} -i "$in$" -c:v libx265 -preset {ffmpeg_preset} -x265-params frame-threads={ffmpeg_frame_threads}{numa} "$out$"'
         self.out = '$out$'  
         self.inp = '$in$'
         self.stop = False
@@ -31,13 +34,11 @@ class VideoCompressor():
         except Exception as e:
             print(f"video compress error [{e}]")    
 
-        # Forzar recolección de basura
         gc.collect()
 
         self.stop = True
         self.ended = True
         return True
-
 
     def set_file(self,filename):
         if not os.path.isfile(filename):
@@ -50,18 +51,23 @@ class VideoCompressor():
         self.out = filename + ".comp.mp4"
         return True
 
-
     def stat_update(self):
+        total = 0
+        part = 0
         while True:       
-
             time.sleep(3)
-
             if self.stop:
                 break
-
-            total = os.path.getsize(self.inp)
-            part  = os.path.getsize(self.out)
-            percent = part / total * 100
+                
+            if os.path.exists(self.inp):
+                total = os.path.getsize(self.inp)
+            if os.path.exists(self.out):
+                part  = os.path.getsize(self.out)
+            
+            percent = 0
+            if total > 0:
+                percent = part / total * 100
+                
             if self.callback != None:
                 if self.parse_ended :
                     self.callback(total,part,self.ended,*self.args)
@@ -69,6 +75,11 @@ class VideoCompressor():
                     self.callback(total,part,*self.args)
                     
         if self.callback != None:
+            if os.path.exists(self.inp):
+                total = os.path.getsize(self.inp)
+            if os.path.exists(self.out):
+                part  = os.path.getsize(self.out)
+
             if self.parse_ended :
                 self.callback(total,part,self.ended,*self.args)
             else:

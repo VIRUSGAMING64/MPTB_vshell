@@ -178,7 +178,10 @@
         <div class="action-section" style="margin-top: 20px; border-color: var(--accent-color);">
             <h3 style="margin-top: 0; color: var(--accent-color);">🚀 Estado de Conversión</h3>
             <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9em;">
+                <span>Procesando: <strong id="currentFileText" style="color: #fff;">-</strong></span>
                 <span>Completado: <strong id="percentText" style="color: var(--accent-color);">0%</strong></span>
+            </div>
+             <div style="display: flex; justify-content: flex-end; margin-bottom: 5px; font-size: 0.8em;">
                 <span style="font-family: monospace; color: #aaa;"><span id="part">0</span> / <span id="total">0</span></span>
             </div>
             
@@ -187,6 +190,14 @@
                 <div class="progress" style="width: 0%; height: 100%; background-color: var(--accent-color); transition: width 0.3s ease; box-shadow: 0 0 10px var(--accent-color);">
                 </div>
             </div>
+            
+            <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                <h4 style="margin: 0 0 10px 0; font-size: 0.9em; color: #ccc;">⏳ Cola de Espera</h4>
+                <div id="queueList" style="font-size: 0.85em; color: #888; max-height: 100px; overflow-y: auto;">
+                    <div style="font-style: italic;">Cola vacía</div>
+                </div>
+            </div>
+
              <div style="margin-top: 5px; font-size: 0.8em; text-align: right; display:none;">
                 <span>Terminado: <span id="okVal">NO</span></span>
             </div>
@@ -243,7 +254,7 @@
                             <a href="#" onclick="navigate('${newPath}'); return false;" class="file-name">${folder}</a>
                         </div>
                         <div class="file-actions">
-                            <button onclick="deleteItem('${folder}', 'folder')" class="btn btn-danger btn-sm">🗑️</button>
+                            <button onclick="deleteItem('${folder.replace(/'/g, "\\'")}', 'folder')" class="btn btn-danger btn-sm">🗑️</button>
                         </div>
                     `;
                     list.appendChild(li);
@@ -258,9 +269,9 @@
                             <span class="file-name">${file}</span>
                         </div>
                         <div class="file-actions">
-                            <button onclick="convertFile('${file}')" class="btn btn-sm">X265</button>
+                            <button onclick="convertFile('${file.replace(/'/g, "\\'")}')" class="btn btn-sm">X265</button>
                             <a href="/download?path=${encodeURIComponent(data.current_path)}&filename=${encodeURIComponent(file)}" class="btn btn-sm">⬇️</a>
-                            <button onclick="deleteItem('${file}', 'file')" class="btn btn-danger btn-sm">🗑️</button>
+                            <button onclick="deleteItem('${file.replace(/'/g, "\\'")}', 'file')" class="btn btn-danger btn-sm">🗑️</button>
                         </div>
                     `;
                     list.appendChild(li);
@@ -400,6 +411,30 @@
                 document.getElementById('part').innerText = formatBytes(part);
                 document.getElementById('total').innerText = formatBytes(total);
                 document.getElementById('percentText').innerText = percent.toFixed(1) + '%';
+                
+                // Update Queue UI
+                const queueList = document.getElementById('queueList');
+                if (data.combertion.queue && data.combertion.queue.length > 0) {
+                    queueList.innerHTML = '';
+                    data.combertion.queue.forEach((item, index) => {
+                         const div = document.createElement('div');
+                         div.textContent = `${index + 1}. ${item}`;
+                         div.style.padding = '2px 0';
+                         queueList.appendChild(div);
+                    });
+                } else {
+                    queueList.innerHTML = '<div style="font-style: italic;">Cola vacía</div>';
+                }
+
+                // Update Current File
+                 const currentFileText = document.getElementById('currentFileText');
+                 if (data.combertion.current) {
+                     currentFileText.textContent = data.combertion.current;
+                     currentFileText.style.color = '#fff';
+                 } else {
+                     currentFileText.textContent = 'Ninguno';
+                     currentFileText.style.color = '#666';
+                 }
                 
             } catch (e) { console.log(e); }
         }

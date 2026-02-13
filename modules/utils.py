@@ -99,6 +99,8 @@ def GetMedia(message:Message):
         media_type += VOICE
     return media_type
 
+def GetMediaTypeFromFile(message:Message):
+    img = ["jpg","jpeg","png"]
 
 def get_file_id(message: Message):
     typ = GetMedia(message)

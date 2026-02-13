@@ -30,9 +30,19 @@ def only_message(message:Message):
     gpt(message)        
 
 
-def only_up_media(message:Message):
+def only_up_media(message:Message):#TODO
     if message == None:
         return
+    media_type = GetMediaTypeFromFile(message)
+    if media_type == VIDEO:
+        pass
+    elif media_type == DOCUMENT:
+        pass
+    elif media_type == AUDIO:
+        pass
+    else:
+        await_exec(message.reply_text,[f"sorry not implemented fot this media type: {media_type}"], bot.bot_data["bot_loop"])
+    
     await_exec(message.reply_text,["sorry not implemented"], bot.bot_data["bot_loop"])
 
 
