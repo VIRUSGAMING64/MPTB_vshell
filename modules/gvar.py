@@ -7,6 +7,8 @@ import openai
 import httpx
 import asyncio
 
+from modules.core import mail
+from modules.core.mail import MailServer
 from modules.database import database
 
 TOKEN               = os.getenv("TOKEN")
@@ -20,14 +22,15 @@ PROXY_HTTP          = os.getenv("HTTP_PROXY")
 PROXY_HTTPS         = os.getenv("HTTPS_PROXY") 
 BOT_HANDLER         = os.getenv("BOT_HANDLER","")
 NEXT_CLOUD_SHARED   = os.getenv("NEXT_CLOUD_SHARED")
-YTDLP_COOKIES      = os.getenv("YTDLP_COOKIES",None)
+YTDLP_COOKIES       = os.getenv("YTDLP_COOKIES",None)
 GMAIL               = os.getenv("GMAIL")   
 GMAIL_KEY           = os.getenv("GMAIL_KEY")
 RESEND_API_KEY      = os.getenv("RESEND_API_KEY") # Nueva variable
 UH_MAIL             = os.getenv("UH_MAIL")
 FUSE_GROUP_ID       = None #Ignored if fuse off
 DB_SAVE_TIMEOUT     = 60 #in seconds
-
+KB                  = 1024
+MB                  = KB * 1024
 ADMINS_ID           = []
 DEBUG_ID            = []
 
@@ -38,7 +41,7 @@ bot                 = None
 sender              = None  
 main_bot_loop       = None
 base                = database()
-
+mailer              = MailServer()
 
 PROXYES             = {
   "http": PROXY_HTTP,

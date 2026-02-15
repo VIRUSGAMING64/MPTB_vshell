@@ -14,7 +14,6 @@ import threading as th
 from modules.fuse import *
 from modules.core.mail import *
 
-
 def mailput(message:Message,command:str):
     command = command.removeprefix('/mailput ')
     user = base.get(message.from_user.id)
@@ -25,6 +24,7 @@ def mailput(message:Message,command:str):
             bot.bot_data['bot_loop']
         )
         return  
+    
     path = os.path.join(user.path,command)
     if not os.path.exists(path) or not os.path.isfile(path): 
         await_exec(
@@ -33,11 +33,9 @@ def mailput(message:Message,command:str):
             bot.bot_data['bot_loop']
         )
         return
-
-    mail_sender = MailHandler(RESEND_API_KEY, "onboarding@resend.dev")
     
     try:
-        mail_sender.send_file(UH_MAIL , path)
+        mailer.upload(path)
     except Exception as e:
         await_exec(
             message.reply_text, 
@@ -73,3 +71,30 @@ def adduhmail(message:Message,command:str):
         [f"UH Mail set to {UH_MAIL}"],
         bot.bot_data['bot_loop']
     )
+
+def appendmail(message:Message , command : str):
+    command = command.removeprefix("/appendmail ")
+    user    = base.get(message.from_user.id)
+    if user.state & ADMIN == 0:
+        await_exec(
+            message.reply_text,
+            ["YOU are not admin"],
+            bot.bot_data["bot_loop"]
+        )
+        return
+    try:
+        command = command.split(",")
+        uhmail = command[0]
+        key    = command[1] 
+        mailer.add(key,uhmail)
+        await_exec(
+            message.reply_text,
+            [f"Mail added successfully"],
+            bot.bot_data["bot_loop"]
+        )    
+    except Exception as e:
+        await_exec(
+            message.reply_text,
+            [f"error adding mail [{e}]"],
+            bot.bot_data["bot_loop"]
+        )

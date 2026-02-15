@@ -21,6 +21,33 @@ def humanbytes(size):
     return f"{round(size, 2)} {units[n]}B"
 
 
+def split_path(target_path, chunks_sizes):
+    i = 0
+    with open(target_path, 'rb') as f:
+        l = 0
+        chunk = ""
+        while True:
+            if l + 64 * 1024 <= chunks_sizes:
+                chunk = f.read(64 * 1024)
+                l += 64 * 1024
+            else:
+                chunk = f.read(chunks_sizes - l)
+                l = chunks_sizes
+
+            if not chunk:
+                break
+
+            part_filename = f"{target_path}.{str(i + 1).zfill(3)}"
+            with open(part_filename, 'ab') as part_file:
+                part_file.write(chunk)
+            if l == chunks_sizes:
+                l = 0
+                i+= 1            
+            
+        i += 1
+    return i
+
+
 def time_formatter(seconds: int) -> str:
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
