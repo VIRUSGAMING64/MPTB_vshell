@@ -9,7 +9,7 @@ def gpt(message:Message):
         print(str(user))
         if not (user.state & LLM):
             s = "contact to any admin for access to gpt-5-nano"
-            await_exec(message.reply_text,[s])
+            await_exec(message.reply_text,[s], bot.bot_data['bot_loop'])
             return
         
         if message == None:
@@ -26,6 +26,6 @@ def gpt(message:Message):
         )    
         
         res = response.output_text.replace("\\n","\n")
-        await_exec(message.reply_text,[res])
+        await_exec(message.reply_text,[res], bot.bot_data['bot_loop'])
     except Exception as e:
-        await_exec(message.reply_text,[f"error {str(e)}"])
+        await_exec(message.reply_text,[f"error {str(e)}"], bot.bot_data['bot_loop'])
