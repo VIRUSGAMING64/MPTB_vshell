@@ -34,7 +34,8 @@ def mailput(message:Message,command:str):
         )
         return
 
-    mail_sender = MailHandler(GMAIL,GMAIL_KEY)
+    mail_sender = MailHandler(RESEND_API_KEY, "onboarding@resend.dev")
+    
     try:
         mail_sender.send_file(UH_MAIL , path)
     except Exception as e:
