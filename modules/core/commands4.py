@@ -17,7 +17,7 @@ from modules.core.mail import *
 
 
 def mailput(message:Message,command:str):
-    command = command.removeprefix('/put ')
+    command = command.removeprefix('/mailput ')
     user = base.get(message.from_user.id)
     if user.state & ADMIN == 0:
         await_exec(
@@ -49,5 +49,27 @@ def mailput(message:Message,command:str):
     await_exec(
         message.reply_text, 
         ["File sent successfully"],
+        bot.bot_data['bot_loop']
+    )
+
+
+
+def adduhmail(message:Message,command:str):
+    global UH_MAIL
+    command = command.removeprefix('/adduhmail ')
+    user = base.get(message.from_user.id)
+    if user.state & ADMIN == 0:
+        await_exec(
+            message.reply_text,
+            ["You are not admin"],
+            bot.bot_data['bot_loop']
+        )
+        return  
+    
+    UH_MAIL = command
+    
+    await_exec(
+        message.reply_text,
+        [f"UH Mail set to {UH_MAIL}"],
         bot.bot_data['bot_loop']
     )

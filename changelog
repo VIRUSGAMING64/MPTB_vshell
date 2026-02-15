@@ -1,3 +1,5 @@
+3.14.2.0
+Added command to set UH Mail
 3.14.1.0
 Critical error fixed, variables for mail handler were not loaded from env
 3.14.0.0
