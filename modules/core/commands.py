@@ -48,10 +48,11 @@ def ls(message:Message,command:str):
     except FileNotFoundError:
         await_exec(message.reply_text, ["Directory not found"],
         bot.bot_data['bot_loop'])
-        return  
+        return
 
     files = []
     dirs = []
+    
     for pth in t_dirs:
         full_path = os.path.join(user.path, pth)
         if os.path.isdir(full_path):
@@ -200,6 +201,7 @@ commands = {
     "/cd":          cd,
     "/put":         put,
     "/split":       split,
+    "/putmail":     putmail,
     "/load_cookie": load_cookie
 
 }

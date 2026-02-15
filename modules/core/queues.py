@@ -5,7 +5,6 @@ import threading as th
 import time
 
 TIMEOUT             = 0.4
-
 class Pool():
     """
     is a queue in format [function , args]

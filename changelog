@@ -1,3 +1,6 @@
+3.14.0.0
+Added mailHandler class to send messages and files with gmail
+Added new command to put messages and files to UH CLOUD
 3.13.0.0
 Added queue for video compressing...
 3.12.0.0

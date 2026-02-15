@@ -35,7 +35,6 @@ class VideoCompressor():
             print(f"video compress error [{e}]")    
 
         gc.collect()
-
         self.stop = True
         self.ended = True
         return True

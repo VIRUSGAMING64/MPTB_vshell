@@ -3,7 +3,7 @@ from modules.core.enums import *
 
 class database:
     dic = { }
-    
+     
     def __init__(self,db_name="database.csv"):
         self.name = db_name
         self.load(db_name)
