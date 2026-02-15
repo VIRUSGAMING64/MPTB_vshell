@@ -1,3 +1,5 @@
+3.14.1.0
+Critical error fixed, variables for mail handler were not loaded from env
 3.14.0.0
 Added mailHandler class to send messages and files with gmail
 Added new command to put messages and files to UH CLOUD

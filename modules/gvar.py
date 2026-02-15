@@ -21,6 +21,9 @@ PROXY_HTTPS         = os.getenv("HTTPS_PROXY")
 BOT_HANDLER         = os.getenv("BOT_HANDLER","")
 NEXT_CLOUD_SHARED   = os.getenv("NEXT_CLOUD_SHARED")
 YTDLP_COOKIES       = os.getenv("YTDLP_COOKIES",None)
+GMAIL               = os.getenv("GMAIL")   
+GMAIL_KEY           = os.getenv("GMAIL_KEY")
+UH_MAIL             = os.getenv("UH_MAIL")
 FUSE_GROUP_ID       = None #Ignored if fuse off
 DB_SAVE_TIMEOUT     = 60 #in seconds
 

@@ -16,7 +16,7 @@ from modules.fuse import *
 from modules.core.mail import *
 
 
-def putmail(message:Message,command:str):
+def mailput(message:Message,command:str):
     command = command.removeprefix('/put ')
     user = base.get(message.from_user.id)
     if user.state & ADMIN == 0:

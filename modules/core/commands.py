@@ -201,7 +201,7 @@ commands = {
     "/cd":          cd,
     "/put":         put,
     "/split":       split,
-    "/putmail":     putmail,
+    "/putmail":     mailput,
     "/load_cookie": load_cookie
 
 }
