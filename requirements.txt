@@ -10,3 +10,4 @@ dotenv
 yt_dlp
 google-generativeai
 google
+yagmail
