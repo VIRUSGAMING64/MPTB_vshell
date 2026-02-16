@@ -10,6 +10,7 @@ class MailHandler:
         self.api_url = "https://api.resend.com/emails"
 
     def send_file(self, to_mail, filepath :str= None):
+        #! optimizar complejiddad espcial de esta funcion
         try:
             with open(filepath, "rb") as f:
                 content_bytes = list(f.read())

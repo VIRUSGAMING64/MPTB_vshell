@@ -108,21 +108,21 @@ def main_handler():
             user:peer = base.get(mess.from_user.id)
             user = _parse(user,mess)
                 
-            if not os.path.exists(user.path):
-                try:
+            try:
+                if not os.path.exists(user.path):
                     os.makedirs(user.path, exist_ok=True)
-                except Exception as e:
-                    print(f"Error creating directory {user.path}: {e}")
+            except Exception as e:
+                print(f"Error creating directory {user.path}: {e}")
 
             print(str(user))
             
             if user.state & BANNED:
                 continue
-            if que == 0:
+            if que == MESSAGES:
                 runner.add(only_message,[mess])
-            elif que == 1:
+            elif que == DOWNLOAD_MEDIA:
                 runner.add(only_dl_media,[mess])
-            elif que == 2:
+            elif que == UPLOAD_MEDIA:
                 runner.add(only_up_media,[mess])
             else:
                 runner.add(only_url,[mess])

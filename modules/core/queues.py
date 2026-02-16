@@ -75,13 +75,11 @@ class Pool():
 
 
 class MessageQueue():
-    messages:list[Message]           = []
-    download_media:list[Message]     = []
-    upload_media:list[Message]       = []
-    url:list[Message]                = []
-
     def __init__(self):
-        pass
+        self.messages:list[Message]           = []
+        self.download_media:list[Message]     = []
+        self.upload_media:list[Message]       = []
+        self.url:list[Message]                = []
 
     def push(self,message:Message):
         media_type = GetMedia(message)
@@ -94,6 +92,7 @@ class MessageQueue():
         
         if command == None:
             return
+
         if command.startswith(BOT_HANDLER+" "):
             command = command.removeprefix(BOT_HANDLER+" ")
 
@@ -101,8 +100,7 @@ class MessageQueue():
             self.url.append(message)
             return
         
-        print("pushed message")
-        
+        print("pushed message")      
         self.messages.append(message)
 
     def pop(self,queue_index):
