@@ -1,4 +1,4 @@
-from modules.core.commands4 import *
+from modules.core.commands.commands4 import *
 
 def put(message:Message,command:str):
     command = command.removeprefix('/put ')

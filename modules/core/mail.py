@@ -70,7 +70,7 @@ class MailServer:
         for x in self.set:
             l.append(x)
 
-        return l[self.I]
+        return l[self.I].split('$')
     
     def add(self, key , uh_mail):
-        self.set.add([key , uh_mail])
+        self.set.add(f"{key}${uh_mail}")
