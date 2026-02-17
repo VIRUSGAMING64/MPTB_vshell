@@ -1,4 +1,4 @@
-from modules.core.commands import *
+from modules.commands import *
 from modules.downup import downloader
 from modules.gvar import *
 from modules.chatgpt import *
@@ -130,3 +130,4 @@ def main_handler():
         time.sleep(TIMEOUT)
 
 th.Thread(target=main_handler).start()
+

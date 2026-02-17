@@ -1,4 +1,4 @@
-from modules.core.commands.commands3 import *
+from modules.commands.commands3 import *
 
 
 def get_size(bytes, suffix="B"):

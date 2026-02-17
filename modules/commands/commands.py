@@ -1,4 +1,4 @@
-from modules.core.commands.commands2 import *
+from modules.commands.commands2 import *
 
 
 def headers(message:Message,command:str):

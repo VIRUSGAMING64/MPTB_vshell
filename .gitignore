@@ -1,4 +1,4 @@
-.env
+﻿.env
 .config
 .vscode
 env
@@ -9,3 +9,5 @@ database.csv
 .cph-ng
 *.mp4
 .cph
+.todo
+clean.sh

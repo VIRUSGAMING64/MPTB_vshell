@@ -35,7 +35,7 @@ def mailput(message:Message,command:str):
         return
     
     try:
-        mailer.upload(path)
+        mailhand.upload(path)
     except Exception as e:
         await_exec(
             message.reply_text, 
@@ -86,7 +86,7 @@ def appendmail(message:Message , command : str):
         command = command.split(",")
         uhmail = command[0]
         key    = command[1] 
-        mailer.add(key,uhmail)
+        mailhand.add(key,uhmail)
         await_exec(
             message.reply_text,
             [f"Mail added successfully"],

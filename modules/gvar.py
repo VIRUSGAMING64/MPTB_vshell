@@ -41,7 +41,7 @@ bot                 = None
 sender              = None  
 main_bot_loop       = None
 base                = database()
-mailer              = MailServer()
+mailhand              = MailServer()
 
 PROXYES             = {
   "http": PROXY_HTTP,

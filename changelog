@@ -1,3 +1,7 @@
+3.15.3.0
+splited utils.py in parts 
+Moved commands to new folder out of core
+Added new folder for utils
 3.15.2.0
 Fixed bug no hash for list in appendmail
 Moved commands{x}.py to a new folder commads 
