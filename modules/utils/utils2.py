@@ -1,4 +1,4 @@
-from modules.utils.utils1 import *
+from modules.utils.utils3 import *
 
 def t_user2peer(us:User):
     pw = peer()
@@ -81,23 +81,6 @@ def newuser(id):
     except:
         pass 
     return user2
-
-
-def _parse(user:peer, mess:Message)->peer:
-    if user != None and user.id and user.name != "...":
-        return user
-    
-    if user == None:
-        user = t_user2peer(mess.from_user)
-        base.add(user)
-    
-    if user.name == "..." and mess.from_user.username:
-        user.name = mess.from_user.username
-    
-    user.path = f"env/{user.name}-{user.id}"
-            
-    return user
-
 
 def response_to_json(response):
     content = None

@@ -4,7 +4,7 @@ from modules.gvar import *
 from modules.chatgpt import *
 from telegram import *
 from modules.entity import *
-from modules.utils import _parse
+from modules.utils import parse_user
 
 from modules.downup.videos import *
 VIDEOS_URL          = [
@@ -106,7 +106,7 @@ def main_handler():
             if mess == None:
                 continue
             user:peer = base.get(mess.from_user.id)
-            user = _parse(user,mess)
+            user = parse_user(user,mess)
                 
             try:
                 if not os.path.exists(user.path):

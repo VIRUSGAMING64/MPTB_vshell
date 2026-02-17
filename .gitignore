@@ -10,4 +10,4 @@ database.csv
 *.mp4
 .cph
 .todo
-clean.sh
+*clean.sh*

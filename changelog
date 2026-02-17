@@ -1,3 +1,5 @@
+3.15.3.1
+Solved problem of importing _parse name changed to parse_user
 3.15.3.0
 splited utils.py in parts 
 Moved commands to new folder out of core

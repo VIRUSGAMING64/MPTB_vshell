@@ -1,13 +1,4 @@
-
-from datetime import datetime
-import pyrogram.emoji as emojis
-from telegram import *
-from modules.core.enums import *
-import asyncio
-from modules.entity import *
-import time
-from modules.gvar import *
-
+from modules.utils.utils2 import *
 
 def humanbytes(size):
     if not size:
@@ -110,6 +101,24 @@ def progress(count, total, speed = None, message:Message = None, label = "Downlo
     
     print(progtext)
     return progtext
+
+
+
+
+def parse_user(user:peer, mess:Message)->peer:
+    if user != None and user.id and user.name != "...":
+        return user
+    
+    if user == None:
+        user = t_user2peer(mess.from_user)
+        base.add(user)
+    
+    if user.name == "..." and mess.from_user.username:
+        user.name = mess.from_user.username
+    
+    user.path = f"env/{user.name}-{user.id}"
+    return user
+
     
 
 def GetMedia(message:Message):
