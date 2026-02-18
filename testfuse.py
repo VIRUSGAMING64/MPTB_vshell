@@ -6,7 +6,7 @@ except RuntimeError as e:
     asyncio.set_event_loop(asyncio.new_event_loop())
 from dotenv import load_dotenv
 load_dotenv()
-from modules.fuse.tree import *
+from modules.fuse.file import *
 from pyrogram import *
 import os
 API_ID=os.getenv("API_ID")
@@ -22,14 +22,10 @@ bot = Client(
 
 
 bot.start()
+
 f=file(bot,1659735368)
-
 f.max_size = 4
-
 f.write(b"hello world")
-
 f.name = "candela"
-
 f.created_at = datetime.datetime.now().isoformat()
-
 f.close()

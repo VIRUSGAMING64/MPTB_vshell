@@ -2,7 +2,10 @@
 IS A TELEGRAM FUSE
 TO USE AS FILE SAVER 
 """
-from modules.fuse.tree import *
+from modules.fuse.file import *
+from modules.fuse.folder import *
+from modules.fuse.fsinfo import *
+
 from modules.gvar import *
 import os
 

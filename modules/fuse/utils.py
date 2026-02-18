@@ -1,8 +1,8 @@
-from mailbox import Message
 from pyrogram.client import Client
 
 if fsinfo == None:
-    from modules.fuse.tree import *
+    from .file import *
+    from .folder import *
 
 def download(message,bot:Client,save = "downloads/"):
     bot.download_media(message,save)

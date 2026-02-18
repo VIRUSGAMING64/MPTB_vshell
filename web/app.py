@@ -1,9 +1,6 @@
-from ast import parse
 import os
 import psutil
-from pickle import FALSE
 import shutil
-from threading import Thread
 from flask import Flask, request, redirect, url_for, send_from_directory, jsonify, make_response, session, flash, render_template
 from modules.compress.video import *
 from functools import wraps
