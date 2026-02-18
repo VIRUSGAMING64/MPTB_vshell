@@ -56,7 +56,7 @@ class MailServer:
                 key,to_mail = self.GetNextMail()
                 self.putmail(filename +"."+ str(i + 1, to_mail , key).zfill(3))
         except Exception as e:
-            raise Exception(f"Error uploading file to [{to_mail}]:[{filename}.{str(i + 1).zfill(3)}]")
+            raise Exception(f"Error uploading file to [{to_mail}]:[{filename}.{str(i + 1).zfill(3)}]\nError: [{e}]")
 
 
     def putmail(self,filename, uhmail, key):
