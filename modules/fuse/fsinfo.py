@@ -1,6 +1,4 @@
 import datetime
-from operator import le
-
 import pyrogram
 from pyrogram.types import Message
 from modules.core.enums import *

@@ -49,12 +49,13 @@ class MailServer:
         size = pth.getsize(filename)
         if (size >= len(self.set) * 400 * MB):
             raise "File is large"
-        count = split_path(filename, 5 * MB)
+        count = split_path(filename, 30 * MB)
 
         try:
             for i in range(count):
                 key,to_mail = self.GetNextMail()
                 self.putmail(filename +"."+ str(i + 1).zfill(3), to_mail , key)
+                time.sleep(2)
         except Exception as e:
             raise Exception(f"Error uploading file to [{to_mail}]:[{filename}.{str(i + 1).zfill(3)}]\nError: [{e}]")
 
@@ -69,7 +70,6 @@ class MailServer:
         l = []
         for x in self.set:
             l.append(x)
-
         return l[self.I].split('$')
     
     def add(self, key , uh_mail):

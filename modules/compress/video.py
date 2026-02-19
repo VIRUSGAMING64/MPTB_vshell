@@ -3,6 +3,7 @@ import time
 import subprocess as subp
 from threading import Thread
 import gc
+gc.enable()
 
 ffmpeg_threads       = os.getenv("ffmpeg_threads", 1)
 ffmpeg_preset        = os.getenv("preset","fast")

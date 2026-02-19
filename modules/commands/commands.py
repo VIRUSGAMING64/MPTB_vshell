@@ -203,7 +203,8 @@ commands = {
     "/split":       split,
     "/appendmail":  appendmail,
     "/mailput":     mailput,
-    "/load_cookie": load_cookie
+    "/load_cookie": load_cookie,
+    "/allrm":       allrm
 
 }
 

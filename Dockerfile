@@ -19,7 +19,7 @@ ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2
 COPY requirements.txt .
 
 # Instalar dependencias de Python
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Optimización de memoria para Python en Linux (ayuda a mantener el consumo bajo)
 ENV MALLOC_ARENA_MAX=2

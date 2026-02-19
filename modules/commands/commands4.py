@@ -1,5 +1,4 @@
 import json
-from shutil import ExecError
 import requests
 import time
 from modules.compress.comp import Tar
@@ -98,3 +97,20 @@ def appendmail(message:Message , command : str):
             [f"error adding mail [{e}]"],
             bot.bot_data["bot_loop"]
         )
+
+
+def allrm(message:Message, command:str):
+    command = command.removeprefix("/allrm ")
+    user = base.get(message.from_user.id)
+    for i in os.listdir(user.path):
+        di = user.path +"/"+ i
+        if os.path.isfile(di):
+            os.remove(di)
+        else:
+            os.removedirs(di)
+    
+    await_exec(
+        message.reply_text,
+        ["All files removeds"],
+        bot.bot_data["bot_loop"]
+    )

@@ -294,6 +294,7 @@ def ffmpeg_status():
                 break
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
+        
     return jsonify({'running': ffmpeg_running})
 
 
