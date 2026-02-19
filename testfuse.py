@@ -20,7 +20,6 @@ bot = Client(
     bot_token=TOKEN
 )
 
-
 bot.start()
 
 f=file(bot,1659735368)

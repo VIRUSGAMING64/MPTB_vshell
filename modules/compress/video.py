@@ -9,6 +9,7 @@ ffmpeg_threads       = os.getenv("ffmpeg_threads", 1)
 ffmpeg_preset        = os.getenv("preset","fast")
 ffmpeg_frame_threads = os.getenv("ffmpeg_freme_threads", 1)
 numa                 = os.getenv("numa",":numa-pools=none") 
+
 class VideoCompressor():
     def __init__(self,filename = None,callback = None,args = [],parse_end=False):
         self.base_cmd = f'ffmpeg -threads {ffmpeg_threads} -i "$in$" -c:v libx265 -preset {ffmpeg_preset} -x265-params frame-threads={ffmpeg_frame_threads}{numa} "$out$"'

@@ -1,0 +1,194 @@
+ :root {
+     --bg-color: #121212;
+     --container-bg: #1e1e1e;
+     --text-color: #e0e0e0;
+     --border-color: #333;
+     --accent-color: #64b5f6;
+     --btn-bg: #2196f3;
+     --btn-hover: #1976d2;
+     --danger-color: #f44336;
+ }
+
+ body {
+     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+     max-width: 900px;
+     margin: 0 auto;
+     padding: 15px;
+     background-color: var(--bg-color);
+     color: var(--text-color);
+ }
+
+ #neuron-canvas {
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100%;
+     height: 100%;
+     z-index: -1;
+ }
+
+ .container {
+     background-color: var(--container-bg);
+     padding: 20px;
+     border-radius: 12px;
+     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+ }
+
+ h1,
+ h3 {
+     color: #fff;
+ }
+
+ .actions-bar {
+     display: flex;
+     gap: 15px;
+     margin-bottom: 20px;
+     flex-wrap: wrap;
+ }
+
+ .action-section {
+     flex: 1;
+     padding: 15px;
+     border: 1px solid var(--border-color);
+     border-radius: 8px;
+     background-color: rgba(255, 255, 255, 0.02);
+ }
+
+ .file-list {
+     list-style: none;
+     padding: 0;
+ }
+
+ .file-item {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 12px 10px;
+     border-bottom: 1px solid var(--border-color);
+ }
+
+ .file-item:last-child {
+     border-bottom: none;
+ }
+
+ .file-info {
+     display: flex;
+     align-items: center;
+     gap: 10px;
+     flex: 1;
+     overflow: hidden;
+ }
+
+ .file-icon {
+     font-size: 1.2em;
+     min-width: 24px;
+     text-align: center;
+ }
+
+ .file-name {
+     word-break: break-all;
+     color: var(--text-color);
+     text-decoration: none;
+     cursor: pointer;
+ }
+
+ .file-name:hover {
+     text-decoration: underline;
+ }
+
+ .file-actions {
+     display: flex;
+     gap: 10px;
+ }
+
+ .btn {
+     background-color: var(--btn-bg);
+     color: white;
+     padding: 8px 16px;
+     border: none;
+     border-radius: 4px;
+     cursor: pointer;
+     font-size: 0.9em;
+     text-decoration: none;
+     display: inline-block;
+ }
+
+ .btn:hover {
+     background-color: var(--btn-hover);
+ }
+
+ .btn-danger {
+     background-color: var(--danger-color);
+ }
+
+ .btn-danger:hover {
+     background-color: #d32f2f;
+ }
+
+ .btn-sm {
+     padding: 5px 10px;
+     font-size: 0.8em;
+ }
+
+ input[type="text"],
+ input[type="file"] {
+     padding: 8px;
+     border-radius: 4px;
+     border: 1px solid var(--border-color);
+     background-color: var(--bg-color);
+     color: var(--text-color);
+     margin-right: 10px;
+ }
+
+ .breadcrumb {
+     margin-bottom: 20px;
+     padding: 10px;
+     background-color: rgba(255, 255, 255, 0.05);
+     border-radius: 4px;
+ }
+
+ .breadcrumb a {
+     color: var(--accent-color);
+     text-decoration: none;
+ }
+
+ .breadcrumb span {
+     color: var(--text-color);
+ }
+
+ .flash-messages {
+     margin-bottom: 20px;
+ }
+
+ .flash-message {
+     padding: 10px;
+     border-radius: 4px;
+     margin-bottom: 5px;
+ }
+
+ .flash-success {
+     background-color: rgba(76, 175, 80, 0.2);
+     border: 1px solid #4caf50;
+ }
+
+ .flash-error {
+     background-color: rgba(244, 67, 54, 0.2);
+     border: 1px solid #f44336;
+ }
+
+ @media (max-width: 600px) {
+     .actions-bar {
+         flex-direction: column;
+     }
+
+     .file-item {
+         flex-direction: column;
+         align-items: flex-start;
+         gap: 10px;
+     }
+
+     .file-actions {
+         width: 100%;
+         justify-content: flex-end;
+     }
+ }

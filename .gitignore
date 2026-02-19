@@ -12,3 +12,4 @@ database.csv
 .todo
 *clean.sh*
 testfuse.py
+.gitignore

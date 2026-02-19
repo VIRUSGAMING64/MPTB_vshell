@@ -2,9 +2,8 @@ from modules.entity import *
 from modules.core.enums import *
 
 class database:
-    dic = { }
-     
     def __init__(self,db_name="database.csv"):
+        self.dic = {}
         self.name = db_name
         self.load(db_name)
 
@@ -15,7 +14,7 @@ class database:
         self.dic[user.id] = user
     
     def str_user(self,data:str) -> peer:
-        new = peer()
+        new             = peer()
         data            = data.split(",")
         new.name        = data[USERNAME]
         new.id          = int(data[ID])
