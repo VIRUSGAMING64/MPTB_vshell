@@ -31,6 +31,11 @@ def stats(message:Message, command:str):
     du              = psutil.disk_usage('/')
     process         = psutil.Process(os.getpid())
     proc_mem        = process.memory_info().rss
+    for child in process.children(recursive=True):
+        try:
+            proc_mem += child.memory_info().rss
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
     msg             =  f"📊Estadísticas del Servidor\n\n"
     msg             += f"⏳Uptime: {uptime_str}\n"
     msg             += f"⚙️CPU: {get_emoji(cpu_percent)} {cpu_percent}\n"
