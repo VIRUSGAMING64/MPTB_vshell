@@ -1,4 +1,5 @@
 import asyncio
+import json
 try:
     asyncio.get_event_loop()
 except RuntimeError as e:
@@ -22,9 +23,10 @@ bot = Client(
 
 bot.start()
 
-f=file(bot,1659735368)
+f=file("file",bot,1659735368)
 f.max_size = 4
 f.write(b"hello world")
 f.name = "candela"
 f.created_at = datetime.datetime.now().isoformat()
 f.close()
+print(json.dumps(f.__dict__(),indent=4))

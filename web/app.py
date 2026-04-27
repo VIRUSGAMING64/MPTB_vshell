@@ -13,6 +13,11 @@ TOTAL = 0
 PART  = 0
 OK    = True
 
+
+@app.route('/libs/<path:filename>')
+def serve_lib(filename):
+    return send_from_directory(os.path.join(app.root_path, 'libs'), filename)
+
 GLOBAL_BASE_DIR = app.config['UPLOAD_FOLDER']
 os.makedirs(GLOBAL_BASE_DIR, exist_ok=True)
 
@@ -88,17 +93,15 @@ def login_required(f):
 def get_base_dir():
     if 'folder' in session:
          return os.path.join(GLOBAL_BASE_DIR, session['folder'])
-    return GLOBAL_BASE_DIR # Fallback or for public if intended, but we will protect routes
+    return GLOBAL_BASE_DIR 
 
 def get_safe_path(req_path):
     base_dir = get_base_dir()
-    # Normalizar y asegurar que el path esté dentro de BASE_DIR
     if not req_path:
         req_path = ''
     # Eliminar barras iniciales para evitar que se interprete como root absoluto
     req_path = req_path.lstrip('/')
     abs_path = os.path.abspath(os.path.join(base_dir, req_path))
-    # print(abs_path)
     if not abs_path.startswith(base_dir):
         return base_dir, ''
     return abs_path, req_path
@@ -207,14 +210,17 @@ def upload_file():
         return jsonify({'success': False, 'message': 'No file part'}), 400
     
     file = request.files['file']
+
     if file.filename == '':
         return jsonify({'success': False, 'message': 'No selected file'}), 400
+    
     if file:
         filename = file.filename
         abs_path, _ = get_safe_path(current_path)
         try:
             file.save(os.path.join(abs_path, filename))
             return jsonify({'success': True, 'message': f'Archivo {filename} subido'})
+
         except Exception as e:
             return jsonify({'success': False, 'message': f'Error al subir: {str(e)}'}), 500
         

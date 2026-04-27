@@ -1,3 +1,6 @@
+3.16.0.0
+Added tailwind to webpage
+Fixed bug in download with ytdlp
 3.15.6.0
 moved scripts and styles to files
 3.15.5.0

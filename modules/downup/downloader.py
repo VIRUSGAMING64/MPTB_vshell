@@ -87,7 +87,7 @@ class downloader:
             end = (total_len * (i + 1)) // threads_count - 1
             if start > end:
                 continue
-            th = Thread(target=self._download, args=(url, start, end, filename, False))
+            th = Thread(target=self._download, args=(url, start, end, filename, False), daemon=True)
             th.start()
             threads.append(th)
         for th in threads:

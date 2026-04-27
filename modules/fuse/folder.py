@@ -1,13 +1,13 @@
 from .fsinfo import *
 
 class folder(fsinfo):
-    def __init__(self,base=None):
-        self.base              = base
+    def __init__(self,name, parent = None, fold = None, files=None):
+        self.name              = name
         self.type              = DIR
-        self.fold:list[folder] = []
-        self.files:list[file]  = []
-        self.save()
-
+        self.fold:list[folder] = fold  if fold  != None else []
+        self.files:list        = files if files != None else []
+        self.parent            = parent
+        
     def find(self,target):
         for _curr in self.files:
             if _curr.name == target:
@@ -21,16 +21,42 @@ class folder(fsinfo):
             res = fold.find(target=target)
             if res != None:
                 return res
-        return None
+        return 
+    
+    def __dict__(self):
+        out = {
+            "files":[],
+            "folders":[],
+            "name": self.name
+        }
+        for fold in self.fold:
+            out["folders"].append(fold.__dict__())
 
-    def push_file(self,file):
-        self.files.append(file)
+        for files in self.files:
+            out["files"].append(files.__dict__())
+
+        return out
+
+
+    def push_file(self,fil):
+        self.files.append(fil)
 
     def pop_file(self,idx):
         return self.files.pop(idx)
+    
+    def ListDir(self):
+        dirs = []
+        for fold in self.fold:
+            dirs.append(fold.name)
 
-    def CreateDirectory(self):
-        fold            = folder(self.base)
+        for files in self.files:
+            dirs.append(files.name)
+
+        return self.ListDir()
+
+
+    def CreateDirectory(self, name):
+        fold            = folder(name)
         fold.bot        = self.bot
         fold.created_at = datetime.datetime.now().isoformat()
         fold.cache_fold = self.cache_fold

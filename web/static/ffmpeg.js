@@ -3,7 +3,9 @@ let currentPath = new URLSearchParams(window.location.search).get('path') || '';
 function showMessage(message, type) {
     const container = document.getElementById('flash-messages');
     const div = document.createElement('div');
-    div.className = `flash-message flash-${type}`;
+    div.className = type === 'success'
+        ? 'rounded-xl border border-emerald-500/40 bg-emerald-500/15 px-4 py-3 text-sm text-emerald-100 shadow-lg shadow-emerald-950/20 backdrop-blur-sm'
+        : 'rounded-xl border border-rose-500/40 bg-rose-500/15 px-4 py-3 text-sm text-rose-100 shadow-lg shadow-rose-950/20 backdrop-blur-sm';
     div.textContent = message;
     container.appendChild(div);
     setTimeout(() => {
@@ -22,11 +24,12 @@ async function loadFiles() {
         }
 
         // Update Breadcrumb
-        let breadcrumbHtml = `Ruta actual: <strong>/${data.current_path ? data.current_path : ''}</strong>`;
+        let breadcrumbHtml = `<div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"><div class="text-sm text-slate-300">Ruta actual: <strong class="text-white">/${data.current_path ? data.current_path : ''}</strong></div>`;
         if (data.current_path) {
             const parentPath = data.current_path.includes('/') ? data.current_path.substring(0, data.current_path.lastIndexOf('/')) : '';
-            breadcrumbHtml += `<a href="#" onclick="navigate('${parentPath}'); return false;" class="btn btn-sm" style="float: right;">⬆️ Subir nivel</a>`;
+            breadcrumbHtml += `<a href="#" onclick="navigate('${parentPath}'); return false;" class="inline-flex items-center justify-center rounded-full border border-sky-500/40 bg-sky-500/10 px-4 py-2 text-xs font-semibold text-sky-200 transition hover:bg-sky-500/20 hover:text-white">⬆️ Subir nivel</a>`;
         }
+        breadcrumbHtml += '</div>';
         document.getElementById('breadcrumb').innerHTML = breadcrumbHtml;
 
         // Update File List
@@ -34,20 +37,20 @@ async function loadFiles() {
         list.innerHTML = '';
 
         if (data.folders.length === 0 && data.files.length === 0) {
-            list.innerHTML = '<li class="file-item" style="justify-content: center; color: #666;">Carpeta vacía</li>';
+            list.innerHTML = '<li class="px-4 py-8 text-center text-sm text-slate-500">Carpeta vacía</li>';
         }
 
         data.folders.forEach(folder => {
             const li = document.createElement('li');
-            li.className = 'file-item';
+            li.className = 'flex flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between';
             const newPath = data.current_path ? `${data.current_path}/${folder}` : folder;
             li.innerHTML = `
-                        <div class="file-info">
-                            <span class="file-icon">📁</span>
-                            <a href="#" onclick="navigate('${newPath}'); return false;" class="file-name">${folder}</a>
+                        <div class="flex min-w-0 items-center gap-3">
+                            <span class="shrink-0 text-xl">📁</span>
+                            <a href="#" onclick="navigate('${newPath}'); return false;" class="truncate font-medium text-slate-100 transition hover:text-sky-300 hover:underline">${folder}</a>
                         </div>
-                        <div class="file-actions">
-                            <button onclick="deleteItem('${folder.replace(/'/g, "\\'")}', 'folder')" class="btn btn-danger btn-sm">🗑️</button>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="deleteItem('${folder.replace(/'/g, "\\'")}', 'folder')" class="inline-flex items-center justify-center rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-200 transition hover:bg-rose-500/20 hover:text-white">🗑️</button>
                         </div>
                     `;
             list.appendChild(li);
@@ -55,16 +58,16 @@ async function loadFiles() {
 
         data.files.forEach(file => {
             const li = document.createElement('li');
-            li.className = 'file-item';
+            li.className = 'flex flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between';
             li.innerHTML = `
-                        <div class="file-info">
-                            <span class="file-icon">📄</span>
-                            <span class="file-name">${file}</span>
+                        <div class="flex min-w-0 items-center gap-3">
+                            <span class="shrink-0 text-xl">📄</span>
+                            <span class="truncate font-medium text-slate-100">${file}</span>
                         </div>
-                        <div class="file-actions">
-                            <button onclick="convertFile('${file.replace(/'/g, "\\'")}')" class="btn btn-sm">X265</button>
-                            <a href="/download?path=${encodeURIComponent(data.current_path)}&filename=${encodeURIComponent(file)}" class="btn btn-sm">⬇️</a>
-                            <button onclick="deleteItem('${file.replace(/'/g, "\\'")}', 'file')" class="btn btn-danger btn-sm">🗑️</button>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="convertFile('${file.replace(/'/g, "\\'")}')" class="inline-flex items-center justify-center rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-2 text-xs font-semibold text-sky-200 transition hover:bg-sky-500/20 hover:text-white">X265</button>
+                            <a href="/download?path=${encodeURIComponent(data.current_path)}&filename=${encodeURIComponent(file)}" class="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white">⬇️</a>
+                            <button onclick="deleteItem('${file.replace(/'/g, "\\'")}', 'file')" class="inline-flex items-center justify-center rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-200 transition hover:bg-rose-500/20 hover:text-white">🗑️</button>
                         </div>
                     `;
             list.appendChild(li);
@@ -212,21 +215,21 @@ async function initStats() {
             data.combertion.queue.forEach((item, index) => {
                 const div = document.createElement('div');
                 div.textContent = `${index + 1}. ${item}`;
-                div.style.padding = '2px 0';
+                div.className = 'py-1 text-slate-300';
                 queueList.appendChild(div);
             });
         } else {
-            queueList.innerHTML = '<div style="font-style: italic;">Cola vacía</div>';
+            queueList.innerHTML = '<div class="italic text-slate-500">Cola vacía</div>';
         }
 
         // Update Current File
         const currentFileText = document.getElementById('currentFileText');
         if (data.combertion.current) {
             currentFileText.textContent = data.combertion.current;
-            currentFileText.style.color = '#fff';
+            currentFileText.className = 'font-semibold text-white';
         } else {
             currentFileText.textContent = 'Ninguno';
-            currentFileText.style.color = '#666';
+            currentFileText.className = 'font-semibold text-slate-500';
         }
 
     } catch (e) { console.log(e); }
@@ -245,14 +248,10 @@ async function updateFfmpegStatus() {
             const indicator = document.getElementById('ffmpeg-indicator');
             if (data.running) {
                 indicator.textContent = 'FFmpeg: EJECUTANDO';
-                indicator.style.backgroundColor = '#4caf50'; // Green
-                indicator.style.color = '#fff';
-                indicator.style.boxShadow = '0 0 5px #4caf50';
+                indicator.className = 'inline-flex items-center rounded-full border border-emerald-500/40 bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-100 shadow-lg shadow-emerald-950/20';
             } else {
                 indicator.textContent = 'FFmpeg: DETENIDO';
-                indicator.style.backgroundColor = '#424242'; // Dark gray
-                indicator.style.color = '#aa';
-                indicator.style.boxShadow = 'none';
+                indicator.className = 'inline-flex items-center rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-semibold text-slate-300 shadow-lg shadow-slate-950/30';
             }
         }
     } catch (error) {

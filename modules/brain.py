@@ -89,9 +89,12 @@ def only_url(message):
         if name in url:
             func(url,user,dlbot,message.chat.id,progress,[0,message,"downloading... "])
             return
+    try:
+        youtube_downloader(url,user,dlbot,message.chat.id,progress,[0,message,"downloading... "])
+    except Exception as e:
+        print(f"Error occurred while downloading ytdlp video: {e}")
 
-
-    mess = await_exec(message.reply_text,[f"Starting download from url: {url}"])
+    mess = await_exec(message.reply_text,[f"Starting download from url: {url}"], bot.bot_data["bot_loop"])
     user = base.get(message.from_user.id)
     down = downloader(progress, [0,mess,"downloading... "])
     name = down.getname(url)
@@ -129,5 +132,5 @@ def main_handler():
         
         time.sleep(TIMEOUT)
 
-th.Thread(target=main_handler).start()
+th.Thread(target=main_handler, daemon = True).start()
 

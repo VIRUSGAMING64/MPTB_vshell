@@ -4,7 +4,7 @@ import base64
 
 
 class file(fsinfo):
-    def __init__(self,bot,gid,mode = "wb"):
+    def __init__(self, name ,bot = None ,gid= None,mode = "wb"):
         self.pointer  = 0
         self.root     = 0
         self.tmp_size = 0
@@ -15,6 +15,16 @@ class file(fsinfo):
         self.gid      = gid
         self.mode     = mode
         self.curr     = open("tmp",mode)
+        
+    def __dict__(self):
+        return {
+            "type":self.type,
+            "name":self.name,
+            "id:" :self.id,
+            "size":self.size,
+            "date":self.created_at,
+            "chunks": self.chunks
+        }
 
     def __str__(self):
         mess = f"{self.type},{self.name},{self.id},{self.created_at},{self.size}"
@@ -47,26 +57,42 @@ class file(fsinfo):
         self.check()
 
         if self.mode != "rb":
-            raise "Mode error, try in another mode"
-        
-        EOR = self.pointer + count
-        data = b""
-        ant_chk = self.getFileOf(self.pointer)
-        self._download(ant_chk)
+            raise Exception("Mode error, try in another mode")
 
-        while self.pointer != EOR:
+        if not isinstance(count, int):
+            raise TypeError("count must be int")
+
+        if count <= 0 or self.pointer >= self.size:
+            return b""
+
+        eor = min(self.pointer + count, self.size)
+        data = b""
+
+        while self.pointer < eor:
             act_file = self.getFileOf(self.pointer)
-            if self.pointer % self.max_size == 0 and self.pointer + self.max_size <= EOR:
-                self._download(self.chunks[act_file])
-                data += self._read("tmp", self.max_size)
-                ant_chk = act_file
-                self.pointer += self.max_size
-            else:
-                if act_file != ant_chk:
-                    self._download(self.chunks[act_file])
-                    ant_chk = act_file                    
-                self._read("tmp", 1)
-                self.pointer += 1   
+            if act_file < 0 or act_file >= len(self.chunks):
+                break
+
+            self._download(self.chunks[act_file])
+
+            in_chunk_offset = self.pointer % self.max_size
+            remaining = eor - self.pointer
+            to_read = min(self.max_size - in_chunk_offset, remaining)
+
+            with open("tmp", "rb") as fil:
+                fil.seek(in_chunk_offset)
+                piece = fil.read(to_read)
+
+            if not piece:
+                break
+
+            data += piece
+            self.pointer += len(piece)
+
+            if len(piece) < to_read:
+                break
+
+        return data
 
     def write(self,reader):
         self.check()
