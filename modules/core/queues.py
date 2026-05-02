@@ -37,7 +37,7 @@ class Pool():
             self.lock.release()
 
         except Exception as e:
-            raise Exception(f"Thread pool exception [{e}]") 
+            raise Exception(f"Thread pool exception [{str(e)}]") 
 
     def _run(self):
         while True:
@@ -72,7 +72,6 @@ class Pool():
         t = self.running
         self.lock.release()
         return t
-
 
 class MessageQueue():
     def __init__(self):
