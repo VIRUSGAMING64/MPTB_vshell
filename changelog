@@ -1,5 +1,9 @@
+3.16.1.0
+Removed duplicated code
+Added upload function
+Sorted commands and utils
 3.16.0.1
-Error bixed
+Error fixed
 3.16.0.0
 Added tailwind to webpage
 Fixed bug in download with ytdlp

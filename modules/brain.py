@@ -30,20 +30,27 @@ def only_message(message:Message):
     gpt(message)        
 
 
-def only_up_media(message:Message):#TODO
+def only_up_media(message:Message):
     if message == None:
         return
-    media_type = GetMediaTypeFromFile(message)
-    if media_type == VIDEO:
-        pass
-    elif media_type == DOCUMENT:
-        pass
-    elif media_type == AUDIO:
-        pass
-    else:
-        await_exec(message.reply_text,[f"sorry not implemented fot this media type: {media_type}"], bot.bot_data["bot_loop"])
-    
-    await_exec(message.reply_text,["sorry not implemented"], bot.bot_data["bot_loop"])
+
+    try:
+        path = GetPathFromMessage(message)
+        mess = await_exec(message.reply_text,[f"Uploading: {os.path.basename(path)}..."], bot.bot_data["bot_loop"])
+        media_type = GetMediaTypeFromFile(path)
+        if media_type == VIDEO:
+            await_exec(message.reply_video,[open(path, 'rb')], bot.bot_data["bot_loop"])
+        elif media_type == DOCUMENT:
+            await_exec(message.reply_document,[open(path, 'rb')], bot.bot_data["bot_loop"])
+        elif media_type == AUDIO:
+            await_exec(message.reply_audio,[open(path, 'rb')], bot.bot_data["bot_loop"])
+        else:
+            await_exec(message.reply_document,[open(path, 'rb')], bot.bot_data["bot_loop"])
+        
+        await_exec(mess.edit_text,[f"File uploaded successfully: {os.path.basename(path)}"], bot.bot_data["bot_loop"])
+            
+    except Exception as e:
+        await_exec(message.reply_text,[f"Error uploading file: {e}"], bot.bot_data["bot_loop"])
 
 
 def only_dl_media(message:Message):
@@ -91,6 +98,7 @@ def only_url(message):
             return
     try:
         youtube_downloader(url,user,dlbot,message.chat.id,progress,[0,message,"downloading... "])
+        return
     except Exception as e:
         print(f"Error occurred while downloading ytdlp video: {e}")
 

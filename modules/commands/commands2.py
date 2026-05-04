@@ -1,21 +1,5 @@
 from modules.commands.commands3 import *
 
-
-def get_size(bytes, suffix="B"):
-    factor = 1024
-    for unit in ["", "K", "M", "G", "T", "P"]:
-        if bytes < factor:
-            return f"{bytes:.2f}{unit}{suffix}"
-        bytes /= factor
-
-def get_emoji(percent):
-    if percent < 60:
-        return "🟢"
-    elif percent < 85:
-        return "🟡"
-    else:
-        return "🔴"
-
 def stats(message:Message, command:str):
     boot_time       = psutil.boot_time()
     uptime_seconds  = time.time() - boot_time
@@ -57,42 +41,11 @@ def stats(message:Message, command:str):
 
 
 def comp(message:Message, command:str):
-    args = command.removeprefix("/comp ").strip()
-
-    user = base.get(message.from_user.id)
-    target_path = None
-
-    if args.isnumeric():
-        try:
-            target_path = int2path(int(args), user)
-            if target_path:
-                target_path = os.path.join(user.path, target_path)
-            else:
-                await_exec(
-                    message.reply_text, 
-                    ["Index not found"], 
-                    bot.bot_data['bot_loop']
-                )
-                return
-        except Exception:
-            await_exec(
-                message.reply_text, 
-                ["File not found by index"], 
-                bot.bot_data['bot_loop']
-            )
-            return
-    else:
-        target_path = os.path.join(user.path, args)
-    
-    if not os.path.exists(target_path):
-        await_exec(
-            message.reply_text, 
-            ["File not found"], 
-            bot.bot_data['bot_loop']
-        )
+    args = GetPathFromMessage(message)
+    if args == None:
         return
     
-    output_file = f"{target_path}.tar"
+    output_file = f"{args}.tar"
 
     try:
         await_exec(
@@ -101,14 +54,16 @@ def comp(message:Message, command:str):
             bot.bot_data['bot_loop']
         )
         tar = Tar(output_file)
-        tar.add(target_path)
+        tar.add(args)
         tar.close()
         await_exec(message.reply_text, ["Compressed successfully!"], bot.bot_data['bot_loop'])
     except Exception as e:
         await_exec(message.reply_text, [f"Error: {e}"], bot.bot_data['bot_loop'])
 
 def x265(message:Message, command:str):
-    filename = command.removeprefix('/x265 ')
+    filename = GetPathFromMessage(message)
+    if filename == None:
+        return
     message = await_exec(message.reply_text,["encoding..."])
     compressor = VideoCompressor(callback=progress,args=[None,message,"encoding..."])
     if not compressor.set_file(filename):
@@ -157,23 +112,8 @@ def upload(message:Message,command:str):
 
 
 def cd(message:Message,command:str):
-    path = command.removeprefix("/cd ").strip()
+    path = GetPathFromMessage(message)
     user = base.get(message.from_user.id)
-    print(path)
-    try:
-        if path.isnumeric():
-            path = int2path(int(path),user)
-            if path == None:
-                await_exec(message.reply_text, ["index not found"], bot.bot_data['bot_loop'])
-                return
-            
-    except Exception as e:
-        await_exec(message.reply_text, [f"error changing dir {str(e)}"], bot.bot_data['bot_loop'])
-        return
-    
-    if not (os.path.exists(user.path+"/"+path) or not  os.path.isdir(user.path+"/"+path)) and path != "..":
-        await_exec(message.reply_text, ["path not found or not a directory"], bot.bot_data['bot_loop'])
-        return
     
     if path == "..":
         user.path = os.path.dirname(user.path)
@@ -182,6 +122,6 @@ def cd(message:Message,command:str):
     else:
         user.path +=f"/{path}"
 
-    print(user.path,path)
+    print(user.path,path)#! usar os.path.join
     base.add(user)    
     await_exec(message.reply_text, [f"directory changed to {user.path}"], bot.bot_data['bot_loop'])

@@ -1,5 +1,35 @@
 from modules.utils.utils2 import *
 
+
+def GetPathFromMessage(message: Message):
+    """
+    esta funcion no afecta al funcionamiento si es de la forma:
+    @vshell/command id|path
+    """
+    user = base.get(message.from_user.id)
+    comm = message.text.split()
+    if len(comm) < 2:
+        await_exec(message.reply_text,["Usage: /command <filename> or /command <idx>"], bot.bot_data["bot_loop"])
+        return
+    
+    id = comm[1]
+    pth = None
+    
+    if id.isdigit():
+        idx = int(id)
+        files = os.listdir(user.path)
+        if 0 <= idx < len(files):
+            pth = os.path.join(user.path, files[idx])
+        else:
+            await_exec(message.reply_text,[f"Invalid index: {idx}"], bot.bot_data["bot_loop"])
+            return
+    else:
+        pth = os.path.join(user.path, id)
+    
+    if not os.path.exists(pth):
+        await_exec(message.reply_text,[f"File not found: {id}"], bot.bot_data["bot_loop"])
+    return pth
+
 def humanbytes(size):
     if not size:
         return "0 B"
@@ -103,8 +133,6 @@ def progress(count, total, speed = None, message:Message = None, label = "Downlo
     return progtext
 
 
-
-
 def parse_user(user:peer, mess:Message)->peer:
     if user != None and user.id and user.name != "...":
         return user
@@ -119,35 +147,3 @@ def parse_user(user:peer, mess:Message)->peer:
     user.path = f"env/{user.name}-{user.id}"
     return user
 
-    
-
-def GetMedia(message:Message):
-    media_type = 0
-    if message.video != None:
-        media_type += VIDEO
-    if message.audio != None:
-        media_type += AUDIO
-    if message.document != None:
-        media_type += DOCUMENT
-    if message.photo != ():
-        media_type += PHOTO
-    if message.voice != None:
-        media_type += VOICE
-    return media_type
-
-def GetMediaTypeFromFile(message:Message):
-    img = ["jpg","jpeg","png"]
-
-def get_file_id(message: Message):
-    typ = GetMedia(message)
-    if typ & DOCUMENT:
-        return message.document.file_id
-    elif typ & AUDIO:
-        return message.audio.file_id
-    elif typ & VIDEO:
-        return message.video.file_id
-    elif typ & PHOTO:
-        return message.photo[-1].file_id
-    elif typ & VOICE:
-        return message.voice.file_id
-    return None

@@ -36,7 +36,7 @@ def getid(message:Message,command:str):
 def help_bot(message:Message,command:str): 
     await_exec(
         message.reply_text,
-        ["Hello! I am your bot. [work in progress]"],
+        ["Hello! I am your bot. [DM to google XD]"],
         bot.bot_data['bot_loop']
     )
 
@@ -67,19 +67,8 @@ def ls(message:Message,command:str):
     await_exec(message.reply_text, [s], bot.bot_data['bot_loop'])
 
 def rm(message:Message,command:str):
-    args = command
-    args:str = args.removeprefix("/rm ")
-    user = base.get(message.from_user.id)
-    if args.isnumeric():
-        args = int2path(int(args),user)
-        if args == None:
-            await_exec(message.reply_text, ["index not found"],
-        bot.bot_data['bot_loop'])
-            return
-    
-    args = os.path.join(user.path, args)
-    if not os.path.exists(args):
-        await_exec(message.reply_text, ["path not found"], bot.bot_data['bot_loop'])
+    args = GetPathFromMessage(message)
+    if args == None:
         return
     p = 0
     if os.path.isdir(args):
@@ -88,7 +77,6 @@ def rm(message:Message,command:str):
     else:
         p = 2
         os.remove(args)
-    
     a = ["path","folder","file"]
     await_exec(message.reply_text, [f"{a[p]} removed"],
         bot.bot_data['bot_loop'])
@@ -119,16 +107,8 @@ def mkdir(message:Message,command:str):
     
 
 def size(message:Message,command:str):
-    args = command.removeprefix("/size ")
-    user = base.get(message.from_user.id)
-    if args.isnumeric():
-        args = int2path(int(args),user)
-        if args == None:
-            await_exec(message.reply_text, ["index not found"], bot.bot_data['bot_loop'])
-            return
-    args = user.path + "/" + args
-    if not os.path.exists(args):
-        await_exec(message.reply_text, [f"path not found {args}"], bot.bot_data['bot_loop'])
+    args = GetPathFromMessage(message)
+    if args == None:
         return
     size = os.path.getsize(args)    
     await_exec(message.reply_text,[f"the size is: {size}"], bot.bot_data['bot_loop'])
@@ -177,7 +157,6 @@ def banuser(message:Message,command:str):
     user2.state |= BANNED
     await_exec(message.reply_text,[f"User [{id}] is banned"],
         bot.bot_data['bot_loop'])
-
 
 commands = {
     "/start":       start,
