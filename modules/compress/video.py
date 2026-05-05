@@ -12,7 +12,7 @@ numa                 = os.getenv("numa",":numa-pools=none")
 
 class VideoCompressor():
     def __init__(self,filename = None,callback = None,args = [],parse_end=False):
-        self.base_cmd = f'ffmpeg -threads {ffmpeg_threads} -i "$in$" -c:v libx265 -preset {ffmpeg_preset} -x265-params frame-threads={ffmpeg_frame_threads}{numa} "$out$"'
+        self.base_cmd = f'ffmpeg -threads {ffmpeg_threads} -i "$in$" -c:v libx265 rc-lookahead=0:bframes=0:ref=1:frame-threads=1 -preset {ffmpeg_preset} -x265-params frame-threads={ffmpeg_frame_threads}{numa} "$out$"'
         self.out = '$out$'  
         self.inp = '$in$'
         self.stop = False

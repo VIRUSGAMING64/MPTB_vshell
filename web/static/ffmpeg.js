@@ -59,15 +59,17 @@ async function loadFiles() {
         data.files.forEach(file => {
             const li = document.createElement('li');
             li.className = 'flex flex-col gap-4 px-4 py-4 lg:flex-row lg:items-center lg:justify-between';
+            const fileName = file.name || file;
+            const canX265 = typeof file === 'object' ? file.can_x265 : true;
             li.innerHTML = `
                         <div class="flex min-w-0 items-center gap-3">
                             <span class="shrink-0 text-xl">📄</span>
-                            <span class="truncate font-medium text-slate-100">${file}</span>
+                            <span class="truncate font-medium text-slate-100">${fileName}</span>
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
-                            <button onclick="convertFile('${file.replace(/'/g, "\\'")}')" class="inline-flex items-center justify-center rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-2 text-xs font-semibold text-sky-200 transition hover:bg-sky-500/20 hover:text-white">X265</button>
-                            <a href="/download?path=${encodeURIComponent(data.current_path)}&filename=${encodeURIComponent(file)}" class="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white">⬇️</a>
-                            <button onclick="deleteItem('${file.replace(/'/g, "\\'")}', 'file')" class="inline-flex items-center justify-center rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-200 transition hover:bg-rose-500/20 hover:text-white">🗑️</button>
+                            ${canX265 ? `<button onclick="convertFile('${fileName.replace(/'/g, "\\'")}')" class="inline-flex items-center justify-center rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-2 text-xs font-semibold text-sky-200 transition hover:bg-sky-500/20 hover:text-white">X265</button>` : ''}
+                            <a href="/download?path=${encodeURIComponent(data.current_path)}&filename=${encodeURIComponent(fileName)}" class="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white">⬇️</a>
+                            <button onclick="deleteItem('${fileName.replace(/'/g, "\\'")}', 'file')" class="inline-flex items-center justify-center rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-200 transition hover:bg-rose-500/20 hover:text-white">🗑️</button>
                         </div>
                     `;
             list.appendChild(li);

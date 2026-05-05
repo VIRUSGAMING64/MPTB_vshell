@@ -21,6 +21,11 @@ def serve_lib(filename):
 GLOBAL_BASE_DIR = app.config['UPLOAD_FOLDER']
 os.makedirs(GLOBAL_BASE_DIR, exist_ok=True)
 
+VIDEO_EXTENSIONS = {
+    '.mp4', '.mkv', '.avi', '.mpg', '.mpeg', '.mov', '.webm', '.m4v', '.flv', '.wmv', '.ts', '.m2ts'
+}
+X265_MAX_INPUT_SIZE_MB = int(os.getenv('X265_MAX_INPUT_SIZE_MB', '250'))
+
 # --- Queue System ---
 import threading
 import time
@@ -106,6 +111,28 @@ def get_safe_path(req_path):
         return base_dir, ''
     return abs_path, req_path
 
+
+def is_video_file(filename):
+    _, ext = os.path.splitext(filename.lower())
+    return ext in VIDEO_EXTENSIONS
+
+
+def should_show_x265(filename, abs_path=None):
+    lowered_name = filename.lower()
+
+    if '.comp' in lowered_name:
+        return False, 'compressed'
+
+    if not is_video_file(filename):
+        return False, 'non_video'
+
+    if abs_path and os.path.exists(abs_path):
+        size_limit_bytes = X265_MAX_INPUT_SIZE_MB * 1024 * 1024
+        if os.path.getsize(abs_path) > size_limit_bytes:
+            return False, 'too_large'
+
+    return True, 'ok'
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -152,7 +179,15 @@ def list_files():
             if os.path.isdir(item_path):
                 folders.append(item)
             else:
-                files.append(item)
+                can_x265, x265_reason = should_show_x265(item, item_path)
+                files.append({
+                    'name': item,
+                    'size': os.path.getsize(item_path) if os.path.exists(item_path) else None,
+                    'is_video': is_video_file(item),
+                    'has_comp_suffix': '.comp' in item.lower(),
+                    'can_x265': can_x265,
+                    'x265_reason': x265_reason,
+                })
     except PermissionError:
         return jsonify({'error': 'Permission denied', 'files': [], 'folders': [], 'current_path': rel_path}), 403
 
@@ -162,7 +197,8 @@ def list_files():
     return jsonify({
         'files': files,
         'folders': folders,
-        'current_path': rel_path
+        'current_path': rel_path,
+        'x265_max_input_size_mb': X265_MAX_INPUT_SIZE_MB,
     })
 
 @app.route('/create_folder', methods=['POST'])
@@ -279,6 +315,18 @@ def combert():
         infile, _ = get_safe_path(os.path.join(current_path, item_name))
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error de ruta: {str(e)}'}), 400
+
+    if not os.path.isfile(infile):
+        return jsonify({'success': False, 'message': 'Archivo no encontrado'}), 404
+
+    can_x265, x265_reason = should_show_x265(item_name, infile)
+    if not can_x265:
+        messages = {
+            'compressed': 'Este archivo ya fue comprimido y no se puede volver a comprimir con x265 desde la web',
+            'non_video': 'x265 solo está disponible para archivos de video',
+            'too_large': f'Este archivo supera el límite seguro de {X265_MAX_INPUT_SIZE_MB} MB para x265 en este entorno',
+        }
+        return jsonify({'success': False, 'message': messages.get(x265_reason, 'No se puede comprimir este archivo con x265')}), 400
 
     # infile is absolute path
     added, msg = queue_manager.add_task(infile, update_stat)
