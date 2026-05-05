@@ -192,7 +192,7 @@ def list_files():
         return jsonify({'error': 'Permission denied', 'files': [], 'folders': [], 'current_path': rel_path}), 403
 
     folders.sort()
-    files.sort()
+    files.sort(key=lambda x: x['name'])
     
     return jsonify({
         'files': files,
