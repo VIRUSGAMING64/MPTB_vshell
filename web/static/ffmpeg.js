@@ -13,6 +13,16 @@ function showMessage(message, type) {
     }, 5000);
 }
 
+function buildDownloadUrl(path, fileName) {
+    const normalizedPath = (path || '').replace(/^\/+|\/+$/g, '');
+    const fullPath = normalizedPath ? `${normalizedPath}/${fileName}` : fileName;
+    const encodedPath = fullPath
+        .split('/')
+        .map(segment => encodeURIComponent(segment))
+        .join('/');
+    return `/download/${encodedPath}`;
+}
+
 async function loadFiles() {
     try {
         const response = await fetch(`/api/list?path=${encodeURIComponent(currentPath)}`);
@@ -68,7 +78,7 @@ async function loadFiles() {
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
                             ${canX265 ? `<button onclick="convertFile('${fileName.replace(/'/g, "\\'")}')" class="inline-flex items-center justify-center rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-2 text-xs font-semibold text-sky-200 transition hover:bg-sky-500/20 hover:text-white">X265</button>` : ''}
-                            <a href="/download?path=${encodeURIComponent(data.current_path)}&filename=${encodeURIComponent(fileName)}" class="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white">⬇️</a>
+                            <a href="${buildDownloadUrl(data.current_path, fileName)}" class="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white">⬇️</a>
                             <button onclick="deleteItem('${fileName.replace(/'/g, "\\'")}', 'file')" class="inline-flex items-center justify-center rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-200 transition hover:bg-rose-500/20 hover:text-white">🗑️</button>
                         </div>
                     `;

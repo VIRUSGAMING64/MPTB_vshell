@@ -1,9 +1,10 @@
 import os
 import psutil
 import shutil
-from flask import Flask, request, redirect, url_for, send_from_directory, jsonify, make_response, session, flash, render_template
+from flask import Flask, request, redirect, url_for, send_file, send_from_directory, jsonify, make_response, session, flash, render_template
 from modules.compress.video import *
 from functools import wraps
+from pathlib import Path
 
 app = Flask(import_name=__name__, static_folder='static', template_folder='templates')
 app.secret_key = 'supersecretkey'
@@ -271,9 +272,27 @@ def download_file():
     
     if not filename:
         return make_response("Filename required", 400)
-        
-    abs_path, _ = get_safe_path(req_path)
-    return send_from_directory(abs_path, filename, as_attachment=True)
+
+    direct_path = os.path.join(req_path, filename) if req_path else filename
+    return redirect(url_for('download_file_direct', file_path=direct_path))
+
+
+@login_required
+@app.route('/download/<path:file_path>')
+def download_file_direct(file_path):
+    base_path = Path(get_base_dir()).resolve()
+    abs_path = (base_path / file_path).resolve()
+    try:
+        abs_path.relative_to(base_path)
+    except ValueError:
+        return make_response("Invalid path", 403)
+
+    if not abs_path.is_file():
+        return make_response("File not found", 404)
+
+    response = send_file(str(abs_path), as_attachment=True, conditional=True)
+    response.headers['Accept-Ranges'] = 'bytes'
+    return response
 
 def update_stat(total,part,ok):
     global TOTAL,PART,OK
