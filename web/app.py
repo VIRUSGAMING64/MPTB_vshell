@@ -4,7 +4,7 @@ import shutil
 from flask import Flask, request, redirect, url_for, send_file, send_from_directory, jsonify, make_response, session, flash, render_template
 from modules.compress.video import *
 from functools import wraps
-from werkzeug.utils import safe_join
+from pathlib import Path
 
 app = Flask(import_name=__name__, static_folder='static', template_folder='templates')
 app.secret_key = 'supersecretkey'
@@ -279,23 +279,17 @@ def download_file():
 @login_required
 @app.route('/download/<path:file_path>')
 def download_file_direct(file_path):
-    base_dir = os.path.abspath(get_base_dir())
-    safe_path = safe_join(base_dir, file_path)
-    if safe_path is None:
-        return make_response("Invalid path", 403)
-
-    abs_path = os.path.abspath(safe_path)
+    base_path = Path(get_base_dir()).resolve()
+    abs_path = (base_path / file_path).resolve()
     try:
-        within_base = os.path.commonpath([base_dir, abs_path]) == base_dir
+        abs_path.relative_to(base_path)
     except ValueError:
-        within_base = False
-    if not within_base:
         return make_response("Invalid path", 403)
 
-    if not os.path.isfile(abs_path):
+    if not abs_path.is_file():
         return make_response("File not found", 404)
 
-    response = send_file(abs_path, as_attachment=True, conditional=True)
+    response = send_file(str(abs_path), as_attachment=True, conditional=True)
     response.headers['Accept-Ranges'] = 'bytes'
     return response
 

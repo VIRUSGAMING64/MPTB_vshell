@@ -14,7 +14,7 @@ function showMessage(message, type) {
 }
 
 function buildDownloadUrl(path, fileName) {
-    const normalizedPath = (path || '').replace(/\/+$/, '');
+    const normalizedPath = (path || '').replace(/^\/+|\/+$/g, '');
     const fullPath = normalizedPath ? `${normalizedPath}/${fileName}` : fileName;
     const encodedPath = fullPath
         .split('/')
