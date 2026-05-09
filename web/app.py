@@ -285,7 +285,11 @@ def download_file_direct(file_path):
         return make_response("Invalid path", 403)
 
     abs_path = os.path.abspath(safe_path)
-    if os.path.commonpath([base_dir, abs_path]) != base_dir:
+    try:
+        within_base = os.path.commonpath([base_dir, abs_path]) == base_dir
+    except ValueError:
+        within_base = False
+    if not within_base:
         return make_response("Invalid path", 403)
 
     if not os.path.isfile(abs_path):
