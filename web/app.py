@@ -278,7 +278,12 @@ def download_file():
 @login_required
 @app.route('/download/<path:file_path>')
 def download_file_direct(file_path):
+    base_dir = os.path.abspath(get_base_dir())
     abs_path, _ = get_safe_path(file_path)
+    abs_path = os.path.abspath(abs_path)
+
+    if not (abs_path == base_dir or abs_path.startswith(base_dir + os.sep)):
+        return make_response("Invalid path", 403)
 
     if not os.path.isfile(abs_path):
         return make_response("File not found", 404)
