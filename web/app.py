@@ -1,9 +1,10 @@
 import os
 import psutil
 import shutil
-from flask import Flask, request, redirect, url_for, send_from_directory, jsonify, make_response, session, flash, render_template
+from flask import Flask, request, redirect, url_for, send_file, send_from_directory, jsonify, make_response, session, flash, render_template
 from modules.compress.video import *
 from functools import wraps
+from werkzeug.utils import safe_join
 
 app = Flask(import_name=__name__, static_folder='static', template_folder='templates')
 app.secret_key = 'supersecretkey'
@@ -279,21 +280,18 @@ def download_file():
 @app.route('/download/<path:file_path>')
 def download_file_direct(file_path):
     base_dir = os.path.abspath(get_base_dir())
-    abs_path, _ = get_safe_path(file_path)
-    abs_path = os.path.abspath(abs_path)
+    safe_path = safe_join(base_dir, file_path)
+    if safe_path is None:
+        return make_response("Invalid path", 403)
 
-    if not (abs_path == base_dir or abs_path.startswith(base_dir + os.sep)):
+    abs_path = os.path.abspath(safe_path)
+    if os.path.commonpath([base_dir, abs_path]) != base_dir:
         return make_response("Invalid path", 403)
 
     if not os.path.isfile(abs_path):
         return make_response("File not found", 404)
 
-    response = send_from_directory(
-        os.path.dirname(abs_path),
-        os.path.basename(abs_path),
-        as_attachment=True,
-        conditional=True,
-    )
+    response = send_file(abs_path, as_attachment=True, conditional=True)
     response.headers['Accept-Ranges'] = 'bytes'
     return response
 
