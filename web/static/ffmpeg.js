@@ -13,14 +13,33 @@ function showMessage(message, type) {
     }, 5000);
 }
 
-function buildDownloadUrl(path, fileName) {
+async function getDownloadToken(path, fileName, folder) {
+    // Construir URL directa sin necesidad de sesión
     const normalizedPath = (path || '').replace(/^\/+|\/+$/g, '');
     const fullPath = normalizedPath ? `${normalizedPath}/${fileName}` : fileName;
     const encodedPath = fullPath
         .split('/')
         .map(segment => encodeURIComponent(segment))
         .join('/');
-    return `/download/${encodedPath}`;
+    return `/download/${folder}/${encodedPath}`;
+}
+
+async function downloadFile(path, fileName, folder) {
+    const downloadUrl = await getDownloadToken(path, fileName, folder);
+    window.location.href = downloadUrl;
+}
+
+async function copyDownloadLink(path, fileName, folder) {
+    const downloadUrl = await getDownloadToken(path, fileName, folder);
+    const absoluteUrl = new URL(downloadUrl, window.location.origin).toString();
+
+    try {
+        await navigator.clipboard.writeText(absoluteUrl);
+        showMessage('Enlace copiado al portapapeles', 'success');
+    } catch (error) {
+        console.error(error);
+        showMessage('No se pudo copiar el enlace', 'error');
+    }
 }
 
 async function loadFiles() {
@@ -78,7 +97,8 @@ async function loadFiles() {
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
                             ${canX265 ? `<button onclick="convertFile('${fileName.replace(/'/g, "\\'")}')" class="inline-flex items-center justify-center rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-2 text-xs font-semibold text-sky-200 transition hover:bg-sky-500/20 hover:text-white">X265</button>` : ''}
-                            <a href="${buildDownloadUrl(data.current_path, fileName)}" class="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white">⬇️</a>
+                            <button onclick="downloadFile('${(data.current_path || '').replace(/'/g, "\\'")}', '${fileName.replace(/'/g, "\\'")}', userFolder)" class="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:bg-white/10 hover:text-white">⬇️</button>
+                            <button onclick="copyDownloadLink('${(data.current_path || '').replace(/'/g, "\\'")}', '${fileName.replace(/'/g, "\\'")}', userFolder)" class="inline-flex items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-200 transition hover:bg-emerald-500/20 hover:text-white">🔗</button>
                             <button onclick="deleteItem('${fileName.replace(/'/g, "\\'")}', 'file')" class="inline-flex items-center justify-center rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-200 transition hover:bg-rose-500/20 hover:text-white">🗑️</button>
                         </div>
                     `;

@@ -1,7 +1,8 @@
 import os
 import psutil
 import shutil
-from flask import Flask, request, redirect, url_for, send_file, send_from_directory, jsonify, make_response, session, flash, render_template
+import mimetypes
+from flask import Flask, request, redirect, url_for, send_file, send_from_directory, jsonify, make_response, session, flash, render_template, Response, stream_with_context
 from modules.compress.video import *
 from functools import wraps
 from pathlib import Path
@@ -114,6 +115,40 @@ def get_safe_path(req_path):
     return abs_path, req_path
 
 
+def parse_byte_range(range_header, file_size):
+    if not range_header:
+        return None
+
+    raw_value = range_header.strip()
+    if '=' in raw_value:
+        unit, raw_value = raw_value.split('=', 1)
+        if unit.strip().lower() != 'bytes':
+            return None
+
+    if '-' not in raw_value:
+        return None
+
+    start_text, end_text = raw_value.split('-', 1)
+
+    try:
+        if start_text == '':
+            suffix_length = int(end_text)
+            if suffix_length <= 0:
+                return None
+            start = max(file_size - suffix_length, 0)
+            end = file_size - 1
+        else:
+            start = int(start_text)
+            end = int(end_text) if end_text else file_size - 1
+    except ValueError:
+        return None
+
+    if start < 0 or end < start or start >= file_size:
+        return None
+
+    return start, min(end, file_size - 1)
+
+
 def is_video_file(filename):
     _, ext = os.path.splitext(filename.lower())
     return ext in VIDEO_EXTENSIONS
@@ -161,7 +196,7 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    return render_template('index.html', username=session.get('user'))
+    return render_template('index.html', username=session.get('user'), folder=session.get('folder'))
 
 @app.route('/api/list')
 @login_required
@@ -264,24 +299,16 @@ def upload_file():
         
     return jsonify({'success': False, 'message': 'Error desconocido'}), 500
 
-@login_required
-@app.route('/download')
-def download_file():
-    req_path = request.args.get('path', '')
-    filename = request.args.get('filename')
-    
-    if not filename:
-        return make_response("Filename required", 400)
-
-    direct_path = os.path.join(req_path, filename) if req_path else filename
-    return redirect(url_for('download_file_direct', file_path=direct_path))
-
-
-@login_required
 @app.route('/download/<path:file_path>')
 def download_file_direct(file_path):
-    base_path = Path(get_base_dir()).resolve()
+    """Descarga un archivo sin requerir sesión.
+    El file_path debe tener formato: userfolder/path/to/file
+    Protección contra path traversal incluida.
+    """
+    base_path = Path(GLOBAL_BASE_DIR).resolve()
     abs_path = (base_path / file_path).resolve()
+    
+    # Protección contra path traversal: verificar que el path resuelto está dentro de GLOBAL_BASE_DIR
     try:
         abs_path.relative_to(base_path)
     except ValueError:
@@ -290,8 +317,48 @@ def download_file_direct(file_path):
     if not abs_path.is_file():
         return make_response("File not found", 404)
 
-    response = send_file(str(abs_path), as_attachment=True, conditional=True)
+    file_size = abs_path.stat().st_size
+    range_header = request.headers.get('Range') or request.headers.get('range')
+    byte_range = parse_byte_range(range_header, file_size)
+
+    if range_header and byte_range is None:
+        response = make_response('', 416)
+        response.headers['Content-Range'] = f'bytes */{file_size}'
+        response.headers['Accept-Ranges'] = 'bytes'
+        return response
+
+    content_type = mimetypes.guess_type(str(abs_path))[0] or 'application/octet-stream'
+    download_name = abs_path.name
+
+    if byte_range is None:
+        response = send_file(str(abs_path), as_attachment=True, conditional=True, download_name=download_name)
+        response.headers['Accept-Ranges'] = 'bytes'
+        return response
+
+    start, end = byte_range
+    length = end - start + 1
+
+    def file_iterator():
+        with open(abs_path, 'rb') as file_handle:
+            file_handle.seek(start)
+            remaining = length
+            while remaining > 0:
+                chunk = file_handle.read(min(64 * 1024, remaining))
+                if not chunk:
+                    break
+                remaining -= len(chunk)
+                yield chunk
+
+    response = Response(
+        stream_with_context(file_iterator()),
+        status=206,
+        mimetype=content_type,
+        direct_passthrough=True,
+    )
+    response.headers['Content-Length'] = str(length)
+    response.headers['Content-Range'] = f'bytes {start}-{end}/{file_size}'
     response.headers['Accept-Ranges'] = 'bytes'
+    response.headers['Content-Disposition'] = f'attachment; filename="{download_name}"'
     return response
 
 def update_stat(total,part,ok):

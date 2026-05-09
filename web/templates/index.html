@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Servidor FTP Web Simple</title>
     <script src="/libs/tailwind.js"></script>
+    <script>
+        // Pass server-side variables to JavaScript
+        const userFolder = '{{ folder | default("") }}';
+    </script>
 </head>
 <body class="min-h-screen overflow-x-hidden bg-slate-950 text-slate-100 antialiased">
     <canvas id="neuron-canvas" class="fixed inset-0 -z-10 h-full w-full"></canvas>
