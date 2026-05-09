@@ -270,9 +270,27 @@ def download_file():
     
     if not filename:
         return make_response("Filename required", 400)
-        
-    abs_path, _ = get_safe_path(req_path)
-    return send_from_directory(abs_path, filename, as_attachment=True)
+
+    direct_path = os.path.join(req_path, filename) if req_path else filename
+    return redirect(url_for('download_file_direct', file_path=direct_path))
+
+
+@login_required
+@app.route('/download/<path:file_path>')
+def download_file_direct(file_path):
+    abs_path, _ = get_safe_path(file_path)
+
+    if not os.path.isfile(abs_path):
+        return make_response("File not found", 404)
+
+    response = send_from_directory(
+        os.path.dirname(abs_path),
+        os.path.basename(abs_path),
+        as_attachment=True,
+        conditional=True,
+    )
+    response.headers['Accept-Ranges'] = 'bytes'
+    return response
 
 def update_stat(total,part,ok):
     global TOTAL,PART,OK
