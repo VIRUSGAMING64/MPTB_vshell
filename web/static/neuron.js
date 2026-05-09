@@ -16,6 +16,7 @@ const config = {
     pulseChance: 0.05 // Chance to spawn a new impulse per frame
 };
 
+
 class Node {
     constructor() {
         this.x = Math.random() * width;

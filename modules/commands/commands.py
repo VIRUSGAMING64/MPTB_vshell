@@ -10,11 +10,19 @@ def headers(message:Message,command:str):
         bot.bot_data['bot_loop']
     )
 
-
 def start(message:Message,command:str):
     await_exec(
         message.reply_text,
         ["Hello! I am your bot. How can I assist you today?"],
+        bot.bot_data['bot_loop']
+    )
+
+def headers(message:Message,command:str):
+    url = command.removeprefix("/headers ").strip()
+    response = requests.head(url)
+    await_exec(
+        message.reply_text,
+        [f"Headers for {url}:\n{response.headers}"],
         bot.bot_data['bot_loop']
     )
 
@@ -63,7 +71,7 @@ def ls(message:Message,command:str):
     for pth in dirs:
         s += F"{emojis.FILE_FOLDER} - {pth}\n"
     for pth in files:
-        s += F"{emojis.LINKED_PAPERCLIPS} - {pth}\n"
+        s += F"{emojis.PAGE_FACING_UP} - {pth}\n"
     await_exec(message.reply_text, [s], bot.bot_data['bot_loop'])
 
 def rm(message:Message,command:str):
@@ -81,7 +89,6 @@ def rm(message:Message,command:str):
     await_exec(message.reply_text, [f"{a[p]} removed"],
         bot.bot_data['bot_loop'])
     ls(message,"/ls")
-
 
 def mkdir(message:Message,command:str):
     dirname = command
@@ -124,7 +131,7 @@ def su_state(message:Message,command:str):
     mess =  command
     mess = mess.removeprefix("/su_state ").split()
     ok = len(mess) >= 2
-    for i in range(mess): 
+    for i in range(len(mess)): 
         if not mess[i].isnumeric(): 
             ok = False
         else:
@@ -183,8 +190,7 @@ commands = {
     "/appendmail":  appendmail,
     "/mailput":     mailput,
     "/load_cookie": load_cookie,
-    "/allrm":       allrm
-
+    "/allrm":       allrm        
 }
 
 COMMANDS = commands.keys()

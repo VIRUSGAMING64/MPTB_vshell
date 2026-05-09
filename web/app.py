@@ -24,6 +24,7 @@ os.makedirs(GLOBAL_BASE_DIR, exist_ok=True)
 VIDEO_EXTENSIONS = {
     '.mp4', '.mkv', '.avi', '.mpg', '.mpeg', '.mov', '.webm', '.m4v', '.flv', '.wmv', '.ts', '.m2ts'
 }
+
 X265_MAX_INPUT_SIZE_MB = int(os.getenv('X265_MAX_INPUT_SIZE_MB', '250'))
 
 # --- Queue System ---
