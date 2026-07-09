@@ -1,3 +1,5 @@
+3.19.0.0
+Now you can split videos into chunks to compress them automatically by clicking on x265.
 3.17.0.0
 Fixed bug in x265 conversion
 Added support for x265 conversion in web page

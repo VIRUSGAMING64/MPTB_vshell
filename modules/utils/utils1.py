@@ -83,11 +83,11 @@ def time_formatter(seconds: int) -> str:
 def progress(count, total, speed = None, message:Message = None, label = "Downloading"):
     
     print("progress called")
-    if datetime.now().second % 2 == 0:
+
+    if datetime.now().second % 4 == 0:
         return  
     
     percentage = count * 100 / total if total > 0 else 0
-    
     por = percentage / 10
     color = emojis.RED_CIRCLE
     if por > 4:

@@ -53,7 +53,7 @@ class file(fsinfo):
         fil.close()
         return data
 
-    def read(self,count): #! ESTA FUNCION TIENE ERRORES (creo)
+    def read(self,count) -> bytes: #! ESTA FUNCION TIENE ERRORES (creo)
         self.check()
 
         if self.mode != "rb":

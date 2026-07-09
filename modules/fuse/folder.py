@@ -54,7 +54,6 @@ class folder(fsinfo):
 
         return self.ListDir()
 
-
     def CreateDirectory(self, name):
         fold            = folder(name)
         fold.bot        = self.bot

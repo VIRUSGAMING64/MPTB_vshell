@@ -4,6 +4,7 @@ import shutil
 import mimetypes
 from flask import Flask, request, redirect, url_for, send_file, send_from_directory, jsonify, make_response, session, flash, render_template, Response, stream_with_context
 from modules.compress.video import *
+from modules.utils.videospliter import VideoSplitter
 from functools import wraps
 from pathlib import Path
 
@@ -28,6 +29,7 @@ VIDEO_EXTENSIONS = {
 }
 
 X265_MAX_INPUT_SIZE_MB = int(os.getenv('X265_MAX_INPUT_SIZE_MB', '250'))
+SPLIT_SIZE_MB = int(os.getenv('SPLIT_SIZE_MB', '200'))
 
 # --- Queue System ---
 import threading
@@ -406,6 +408,37 @@ def combert():
     if not os.path.isfile(infile):
         return jsonify({'success': False, 'message': 'Archivo no encontrado'}), 404
 
+    # Primero: comprobar si es video y no tiene sufijo .comp
+    if '.comp' in item_name.lower():
+        return jsonify({'success': False, 'message': 'Este archivo ya fue comprimido y no se puede volver a comprimir con x265 desde la web'}), 400
+
+    if not is_video_file(item_name):
+        return jsonify({'success': False, 'message': 'x265 solo está disponible para archivos de video'}), 400
+
+    # Si el archivo supera el umbral de splitting, lanzamos un hilo para partirlo
+    file_size = os.path.getsize(infile)
+    if file_size > SPLIT_SIZE_MB * 1024 * 1024:
+        def split_and_enqueue():
+            try:
+                vs = VideoSplitter(max_threads=2)
+                parts = vs.split(infile, size=SPLIT_SIZE_MB, delete_original=True, verify=True)
+            except Exception as e:
+                print(f"Split error for {infile}: {e}")
+                return
+
+            added_count = 0
+            for p in parts:
+                ok, msg = queue_manager.add_task(p, update_stat)
+                if ok:
+                    added_count += 1
+
+            print(f"Auto-split: {len(parts)} partes creadas, {added_count} añadidas a la cola")
+
+        threading.Thread(target=split_and_enqueue, daemon=True).start()
+
+        return jsonify({'success': True, 'message': f'Se inició el split en partes de {SPLIT_SIZE_MB} MB y se añadirán a la cola automáticamente.'})
+
+    # Si no hace falta partir, aplicamos las comprobaciones normales y encolamos el archivo
     can_x265, x265_reason = should_show_x265(item_name, infile)
     if not can_x265:
         messages = {
@@ -417,7 +450,6 @@ def combert():
 
     # infile is absolute path
     added, msg = queue_manager.add_task(infile, update_stat)
-    
     if added:
         return jsonify({'success': True, 'message': msg})
     else:

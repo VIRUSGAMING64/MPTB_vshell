@@ -60,8 +60,9 @@ def ls(message:Message,command:str):
 
     files = []
     dirs = []
-    
+
     for pth in t_dirs:
+                                     
         full_path = os.path.join(user.path, pth)
         if os.path.isdir(full_path):
             dirs.append(pth)
@@ -168,8 +169,8 @@ def banuser(message:Message,command:str):
 commands = {
     "/start":       start,
     "/help":        help_bot,
+    "/kill":        kill,    
     "/upload":      upload,
-    "/kill":        kill,
     "/ls":          ls,
     "/mkdir":       mkdir,
     "/rm":          rm,
