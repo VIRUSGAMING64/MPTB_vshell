@@ -28,7 +28,7 @@ VIDEO_EXTENSIONS = {
     '.mp4', '.mkv', '.avi', '.mpg', '.mpeg', '.mov', '.webm', '.m4v', '.flv', '.wmv', '.ts', '.m2ts'
 }
 
-X265_MAX_INPUT_SIZE_MB = int(os.getenv('X265_MAX_INPUT_SIZE_MB', '250'))
+X265_MAX_INPUT_SIZE_MB = int(os.getenv('X265_MAX_INPUT_SIZE_MB', '8192'))
 SPLIT_SIZE_MB = int(os.getenv('SPLIT_SIZE_MB', '200'))
 
 # --- Queue System ---
