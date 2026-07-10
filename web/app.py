@@ -29,30 +29,116 @@ VIDEO_EXTENSIONS = {
 }
 
 X265_MAX_INPUT_SIZE_MB = int(os.getenv('X265_MAX_INPUT_SIZE_MB', '8192'))
-SPLIT_SIZE_MB = int(os.getenv('SPLIT_SIZE_MB', '200'))
+SPLIT_SIZE_MB = int(os.getenv('SPLIT_SIZE_MB', '100'))
 
 # --- Queue System ---
 import threading
 import time
+import re
 
 class QueueManager:
     def __init__(self):
         self.queue = [] # List of dicts: {'path': str, 'callback': func}
         self.current_task = None
+        self.groups = {}
         self.lock = threading.Lock()
         self.stop_event = threading.Event()
         self.worker_thread = threading.Thread(target=self._worker, daemon=True)
         self.worker_thread.start()
 
-    def add_task(self, file_path, callback):
+    def add_task(self, file_path, callback, group_id=None, part_index=None, total_parts=None, final_output=None, original_duration=None):
         with self.lock:
             if any(item['path'] == file_path for item in self.queue):
                 return False, "Ya está en la cola"
             if self.current_task and self.current_task['path'] == file_path:
                 return False, "Ya se está procesando"
-            
-            self.queue.append({'path': file_path, 'callback': callback})
+
+            task = {
+                'path': file_path,
+                'callback': callback,
+                'group_id': group_id,
+                'part_index': part_index,
+                'total_parts': total_parts,
+                'final_output': final_output,
+                'original_duration': original_duration,
+            }
+            self.queue.append(task)
+
+            if group_id is not None:
+                group = self.groups.setdefault(group_id, {
+                    'parts': [],
+                    'compressed_parts': [],
+                    'completed': 0,
+                    'total_parts': total_parts,
+                    'final_output': final_output,
+                    'original_duration': original_duration,
+                    'source_dir': os.path.dirname(file_path),
+                    'base_name': self._group_base_name(file_path),
+                })
+                group['parts'].append(file_path)
+                group['total_parts'] = total_parts or group['total_parts']
+                group['final_output'] = final_output or group['final_output']
+                group['original_duration'] = original_duration or group['original_duration']
+
             return True, "Añadido a la cola"
+
+    def _group_base_name(self, file_path):
+        name = os.path.basename(file_path)
+        name = re.sub(r'(_part\d{3})?(\.comp)?(\.mp4)$', '', name, flags=re.IGNORECASE)
+        return name
+
+    def _is_group_finalized(self, group):
+        total_parts = group.get('total_parts') or 0
+        return total_parts > 0 and group.get('completed', 0) >= total_parts
+
+    def _join_group_if_ready(self, group_id):
+        with self.lock:
+            group = self.groups.get(group_id)
+            if not group or not self._is_group_finalized(group):
+                return None
+            parts = sorted(group.get('compressed_parts') or [f"{p}.comp.mp4" for p in sorted(group['parts'])])
+            final_output = group['final_output'] or os.path.join(group['source_dir'], f"joined_{group['base_name']}.comp.mp4")
+            original_duration = group.get('original_duration')
+
+        print(f"Queue Worker: Joining group {group_id} into {final_output}")
+        vs = VideoSplitter(max_threads=2)
+        temp_output = final_output + ".tmp.mp4"
+        try:
+            joined = vs.join(parts, output=temp_output)
+        except Exception:
+            if os.path.exists(temp_output):
+                try:
+                    os.remove(temp_output)
+                except OSError:
+                    pass
+            raise
+
+        if original_duration is not None:
+            try:
+                info = vs._probe(joined)
+                joined_duration = float(info['format']['duration'])
+                if abs(joined_duration - float(original_duration)) > 0.01:
+                    raise RuntimeError(
+                        f"Duración final {joined_duration:.6f}s != original {float(original_duration):.6f}s"
+                    )
+            except Exception:
+                if os.path.exists(joined):
+                    os.remove(joined)
+                raise
+
+        os.replace(joined, final_output)
+
+        with self.lock:
+            self.groups.pop(group_id, None)
+
+        for part in parts:
+            try:
+                os.remove(part)
+            except OSError:
+                pass
+
+        print(f"Queue Worker: Group {group_id} joined successfully -> {final_output}")
+        return final_output
 
     def get_status(self):
         with self.lock:
@@ -81,6 +167,14 @@ class QueueManager:
                 try:
                     comp = VideoCompressor(path, callback, parse_end=True)
                     comp.compress()
+                    group_id = task.get('group_id')
+                    if group_id is not None:
+                        with self.lock:
+                            group = self.groups.get(group_id)
+                            if group is not None:
+                                group['completed'] = group.get('completed', 0) + 1
+                                group.setdefault('compressed_parts', []).append(f"{path}.comp.mp4")
+                        self._join_group_if_ready(group_id)
                 except Exception as e:
                     print(f"Queue Worker Error processing {path}: {e}")
                 finally:
@@ -418,6 +512,13 @@ def combert():
     # Si el archivo supera el umbral de splitting, lanzamos un hilo para partirlo
     file_size = os.path.getsize(infile)
     if file_size > SPLIT_SIZE_MB * 1024 * 1024:
+        group_id = f"{infile}:{int(time.time() * 1000)}"
+        final_output = f"{os.path.splitext(infile)[0]}.comp.mp4"
+        try:
+            original_duration = float(VideoSplitter()._probe(infile)["format"]["duration"])
+        except Exception as e:
+            return jsonify({'success': False, 'message': f'No se pudo leer la duración original: {e}'}), 500
+
         def split_and_enqueue():
             try:
                 vs = VideoSplitter(max_threads=2)
@@ -427,8 +528,16 @@ def combert():
                 return
 
             added_count = 0
-            for p in parts:
-                ok, msg = queue_manager.add_task(p, update_stat)
+            for index, p in enumerate(parts, 1):
+                ok, msg = queue_manager.add_task(
+                    p,
+                    update_stat,
+                    group_id=group_id,
+                    part_index=index,
+                    total_parts=len(parts),
+                    final_output=final_output,
+                    original_duration=original_duration,
+                )
                 if ok:
                     added_count += 1
 
